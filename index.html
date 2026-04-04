@@ -362,8 +362,8 @@
                     }
                 }
 
-                // Game over if player falls half screen height below camera
-                if (this.y > cameraY + H() / 2) {
+                // Game over if player falls below visible screen + half screen height
+                if (this.y > cameraY + H() * 1.5) {
                     return false;
                 }
 
