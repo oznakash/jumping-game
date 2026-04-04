@@ -149,7 +149,7 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <div id="version">v1.0.7</div>
+    <div id="version">v1.0.8</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -293,39 +293,38 @@
             if (!ctx) return;
 
             const melody = [
-                // Original celebratory, uplifting melody in G Major, 120 BPM
-                // Inspired by joyful, fun celebration songs - catchy and memorable
-                // Bar 1: Uplifting opening leap (G D G)
-                { freq: 392.00, duration: 0.6 },   // G4
-                { freq: 293.66, duration: 0.6 },   // D4
-                { freq: 392.00, duration: 1.2 },   // G4
-                // Bar 2: Climbing energetically (A B C)
-                { freq: 440.00, duration: 0.6 },   // A4
-                { freq: 493.88, duration: 0.6 },   // B4
-                { freq: 523.25, duration: 1.2 },   // C5
-                // Bar 3: Emphatic peak (D held)
-                { freq: 587.33, duration: 2.4 },   // D5 (high, held longer)
-                // Bar 4: Playful descending phrase (D C B A)
+                // Celebratory melody inspired by party anthems - G Major, 120 BPM
+                // Similar feel to "Sweet Caroline" but with original note sequence
+                // Bar 1-2: Ascending hook (G A B D)
+                { freq: 392.00, duration: 0.5 },   // G4
+                { freq: 440.00, duration: 0.5 },   // A4
+                { freq: 493.88, duration: 0.5 },   // B4
+                { freq: 587.33, duration: 1.0 },   // D5 (rise to peak)
+                // Bar 3: Descending celebration (B A G)
+                { freq: 493.88, duration: 0.5 },   // B4
+                { freq: 440.00, duration: 0.5 },   // A4
+                { freq: 392.00, duration: 1.0 },   // G4
+                // Bar 4: Quick bounce back up (A B C D)
+                { freq: 440.00, duration: 0.4 },   // A4
+                { freq: 493.88, duration: 0.4 },   // B4
+                { freq: 523.25, duration: 0.4 },   // C5
+                { freq: 587.33, duration: 0.8 },   // D5
+                // Bar 5: Descending with rhythm (D C B A G)
+                { freq: 587.33, duration: 0.4 },   // D5
+                { freq: 523.25, duration: 0.4 },   // C5
+                { freq: 493.88, duration: 0.4 },   // B4
+                { freq: 440.00, duration: 0.4 },   // A4
+                { freq: 392.00, duration: 0.4 },   // G4
+                // Bar 6: High energetic moment (E D E)
+                { freq: 659.25, duration: 0.5 },   // E5
+                { freq: 587.33, duration: 0.5 },   // D5
+                { freq: 659.25, duration: 1.0 },   // E5
+                // Bar 7: Party descent (D C B)
                 { freq: 587.33, duration: 0.6 },   // D5
                 { freq: 523.25, duration: 0.6 },   // C5
-                { freq: 493.88, duration: 0.6 },   // B4
-                { freq: 440.00, duration: 0.6 },   // A4
-                // Bar 5: Rising again with energy (B C D E)
-                { freq: 493.88, duration: 0.6 },   // B4
-                { freq: 523.25, duration: 0.6 },   // C5
-                { freq: 587.33, duration: 0.6 },   // D5
-                { freq: 659.25, duration: 0.6 },   // E5
-                // Bar 6: Big celebratory peak (G5)
-                { freq: 783.99, duration: 2.4 },   // G5 (very high, celebratory)
-                // Bar 7: Energetic descending bounce (E D C B)
-                { freq: 659.25, duration: 0.6 },   // E5
-                { freq: 587.33, duration: 0.6 },   // D5
-                { freq: 523.25, duration: 0.6 },   // C5
-                { freq: 493.88, duration: 0.6 },   // B4
-                // Bar 8: Strong resolution home (G A G)
-                { freq: 392.00, duration: 0.6 },   // G4
-                { freq: 440.00, duration: 0.6 },   // A4
-                { freq: 392.00, duration: 1.2 },   // G4 (home)
+                { freq: 493.88, duration: 1.0 },   // B4
+                // Bar 8: Resolution (G)
+                { freq: 392.00, duration: 1.5 },   // G4 (finish strong)
             ];
 
             function playMelody() {
