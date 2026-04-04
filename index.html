@@ -10,19 +10,15 @@
             padding: 0;
             box-sizing: border-box;
         }
-
         body {
             overflow: hidden;
             background: #1a1a1a;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
-
         canvas {
             display: block;
             touch-action: none;
-            background: linear-gradient(135deg, #1e90ff, #87ceeb);
         }
-
         #ui {
             display: none;
             position: fixed;
@@ -36,7 +32,6 @@
             padding: 20px;
             overflow-y: auto;
         }
-
         #ui.show {
             display: flex;
             flex-direction: column;
@@ -44,17 +39,14 @@
             justify-content: center;
             text-align: center;
         }
-
         .screen {
             display: none;
             width: 100%;
             max-width: 600px;
         }
-
         .screen.active {
             display: block;
         }
-
         h1 {
             font-size: 3em;
             margin: 20px 0;
@@ -63,23 +55,19 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
-
         h2 {
             font-size: 2em;
             margin: 15px 0;
         }
-
         p, .subtitle {
             font-size: 1.2em;
             margin: 10px 0;
             line-height: 1.6;
         }
-
         .subtitle {
             color: #ffb6c1;
             font-size: 1.1em;
         }
-
         button {
             padding: 15px 40px;
             font-size: 1.2em;
@@ -92,11 +80,9 @@
             font-weight: bold;
             transition: transform 0.2s;
         }
-
         button:active {
             transform: scale(0.95);
         }
-
         input {
             padding: 12px;
             font-size: 1.1em;
@@ -107,7 +93,6 @@
             width: 100%;
             max-width: 300px;
         }
-
         .score-display {
             font-size: 1.5em;
             margin: 20px 0;
@@ -115,13 +100,11 @@
             padding: 15px;
             border-radius: 8px;
         }
-
         .leaderboard {
             width: 100%;
             max-width: 500px;
             margin: 20px 0;
         }
-
         .leaderboard-entry {
             display: flex;
             justify-content: space-between;
@@ -132,23 +115,19 @@
             border-radius: 6px;
             border-left: 4px solid #ff69b4;
         }
-
         .leaderboard-entry.latest {
             background: rgba(255,215,0,0.2);
             border-left-color: #ffd700;
         }
-
         .rank {
             font-weight: bold;
             min-width: 40px;
         }
-
         .name {
             flex: 1;
             margin: 0 15px;
             text-align: left;
         }
-
         .score-value {
             font-weight: bold;
         }
@@ -157,7 +136,6 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="ui">
-        <!-- Start Screen -->
         <div id="startScreen" class="screen active">
             <h1>Anniversary Run</h1>
             <p class="subtitle">Celebrating 14 Years of Oz ❤️ Caroline</p>
@@ -166,7 +144,6 @@
             <button onclick="showLeaderboard()">Leaderboard</button>
         </div>
 
-        <!-- Game Over Screen -->
         <div id="gameOverScreen" class="screen">
             <h2>Game Over</h2>
             <div class="score-display">
@@ -180,7 +157,6 @@
             <button onclick="continueAfterGameOver()">Continue</button>
         </div>
 
-        <!-- Leaderboard Screen -->
         <div id="leaderboardScreen" class="screen">
             <h2>🏆 Top Scores 🏆</h2>
             <div class="leaderboard" id="leaderboardList"></div>
@@ -191,10 +167,8 @@
     </div>
 
     <script>
-        // ========== CONSTANTS ==========
         const GRAVITY = 0.4;
         const JUMP_VELOCITY = -14;
-        const PLATFORM_SPEED = 3;
         const PLAYER_WIDTH = 30;
         const PLAYER_HEIGHT = 40;
         const PLATFORM_WIDTH = 60;
@@ -202,7 +176,6 @@
         const MIN_PLATFORM_GAP = 70;
         const MAX_PLATFORM_GAP = 110;
 
-        // ========== CANVAS SETUP ==========
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -217,178 +190,152 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas);
 
-        const getLogicalWidth = () => canvas.width / (window.devicePixelRatio || 1);
-        const getLogicalHeight = () => canvas.height / (window.devicePixelRatio || 1);
+        const WIDTH = () => canvas.width / (window.devicePixelRatio || 1);
+        const HEIGHT = () => canvas.height / (window.devicePixelRatio || 1);
 
-        // ========== GAME STATE ==========
         let gameState = 'start';
         let score = 0;
         let bestScore = localStorage.getItem('bestScore') ? parseInt(localStorage.getItem('bestScore')) : 0;
-        let scrollOffset = 0;
+        let scrollY = 0;
         let lastEnteredLeaderboard = null;
 
-        // ========== PLAYER ==========
-        let player = {
+        const player = {
             x: 0,
-            y: 0,
-            width: PLAYER_WIDTH,
-            height: PLAYER_HEIGHT,
+            worldY: 0,
             velocityY: 0,
             velocityX: 0,
-            jumping: false,
+            canJump: false,
 
-            init: function() {
-                this.x = getLogicalWidth() / 2 - this.width / 2;
-                this.y = getLogicalHeight() * 0.7;
+            init() {
+                this.x = WIDTH() / 2 - PLAYER_WIDTH / 2;
+                this.worldY = HEIGHT() * 0.7;
                 this.velocityY = 0;
                 this.velocityX = 0;
-                this.jumping = true;
+                this.canJump = true;
             },
 
-            update: function() {
-                // Apply gravity
+            update() {
                 this.velocityY += GRAVITY;
-                this.y += this.velocityY;
-
-                // Horizontal movement
+                this.worldY += this.velocityY;
                 this.x += this.velocityX;
 
-                // Wrap around horizontal edges
-                const w = getLogicalWidth();
-                if (this.x < -this.width) this.x = w;
-                if (this.x > w) this.x = -this.width;
+                const w = WIDTH();
+                if (this.x < 0) this.x = w;
+                if (this.x > w) this.x = 0;
 
-                // Check platform collision
-                platforms.forEach(p => {
-                    if (this.velocityY > 0 &&
-                        this.y + this.height >= p.y &&
-                        this.y + this.height <= p.y + PLATFORM_HEIGHT + 8 &&
-                        this.x + this.width > p.x &&
-                        this.x < p.x + p.width) {
+                this.canJump = false;
+
+                for (let p of platforms) {
+                    if (this.velocityY >= 0 &&
+                        this.worldY + PLAYER_HEIGHT >= p.y &&
+                        this.worldY + PLAYER_HEIGHT <= p.y + PLATFORM_HEIGHT + 10 &&
+                        this.x + PLAYER_WIDTH > p.x &&
+                        this.x < p.x + PLATFORM_WIDTH) {
                         this.velocityY = JUMP_VELOCITY;
+                        this.canJump = true;
                     }
-                });
+                }
 
-                // Game over if fell off bottom
-                if (this.y > getLogicalHeight() + 50) {
+                if (this.worldY > scrollY + HEIGHT() + 100) {
+                    return false;
+                }
+
+                if (this.worldY < scrollY - 100) {
                     return false;
                 }
 
                 return true;
             },
 
-            moveLeft: function() {
+            moveLeft() {
                 this.velocityX = -5;
             },
 
-            moveRight: function() {
+            moveRight() {
                 this.velocityX = 5;
             },
 
-            stopMove: function() {
+            stopMove() {
                 this.velocityX = 0;
             },
 
-            draw: function() {
-                const w = getLogicalWidth();
-                const h = getLogicalHeight();
-
-                // Keep player centered vertically at 70%
-                const targetY = h * 0.7;
-                const offset = this.y - targetY;
-
+            draw() {
+                const screenY = this.worldY - scrollY;
                 ctx.fillStyle = '#ff1493';
-                ctx.fillRect(this.x, targetY, this.width, this.height);
+                ctx.fillRect(this.x, screenY, PLAYER_WIDTH, PLAYER_HEIGHT);
 
-                // Eyes
                 ctx.fillStyle = 'white';
-                ctx.fillRect(this.x + 8, targetY + 8, 6, 6);
-                ctx.fillRect(this.x + 16, targetY + 8, 6, 6);
+                ctx.fillRect(this.x + 8, screenY + 8, 6, 6);
+                ctx.fillRect(this.x + 16, screenY + 8, 6, 6);
                 ctx.fillStyle = 'black';
-                ctx.fillRect(this.x + 9, targetY + 9, 4, 4);
-                ctx.fillRect(this.x + 17, targetY + 9, 4, 4);
+                ctx.fillRect(this.x + 9, screenY + 9, 4, 4);
+                ctx.fillRect(this.x + 17, screenY + 9, 4, 4);
             }
         };
 
-        // ========== PLATFORMS ==========
         let platforms = [];
-        let nextPlatformY = 0;
+        let nextY = 0;
 
         function spawnPlatforms() {
-            const h = getLogicalHeight();
-            const w = getLogicalWidth();
+            const h = HEIGHT();
+            const w = WIDTH();
 
-            while (nextPlatformY < scrollOffset) {
+            while (nextY > scrollY - 200) {
                 const x = Math.random() * (w - PLATFORM_WIDTH);
                 platforms.push({
                     x: x,
-                    y: nextPlatformY
+                    y: nextY
                 });
 
                 const gap = MIN_PLATFORM_GAP + Math.random() * (MAX_PLATFORM_GAP - MIN_PLATFORM_GAP);
-                nextPlatformY -= gap;
+                nextY -= gap;
             }
+
+            platforms = platforms.filter(p => p.y < scrollY + h + 200);
         }
 
         function updateScroll() {
-            const h = getLogicalHeight();
-            const targetY = h * 0.7;
-            const offset = player.y - targetY;
+            const targetScreenY = HEIGHT() * 0.7;
+            const diff = player.worldY - (scrollY + targetScreenY);
 
-            if (offset > 0) {
-                scrollOffset += offset;
-                player.y = targetY;
+            if (diff > 0) {
+                scrollY += diff;
+                player.worldY = scrollY + targetScreenY;
             }
-
-            // Remove platforms that are off-screen
-            platforms = platforms.filter(p => p.y < scrollOffset + h);
-        }
-
-        function drawPlatforms() {
-            const h = getLogicalHeight();
-            const targetY = h * 0.7;
-            const offset = player.y - targetY;
-
-            platforms.forEach(p => {
-                const screenY = p.y - scrollOffset + offset;
-                if (screenY > -20 && screenY < h + 20) {
-                    ctx.fillStyle = '#00aa44';
-                    ctx.fillRect(p.x, screenY, PLATFORM_WIDTH, PLATFORM_HEIGHT);
-                    ctx.fillStyle = '#ffd700';
-                    ctx.fillRect(p.x + 3, screenY, PLATFORM_WIDTH - 6, 5);
-                }
-            });
-        }
-
-        function drawScore() {
-            ctx.fillStyle = 'black';
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText(`Score: ${score}`, 20, 40);
         }
 
         function render() {
-            const w = getLogicalWidth();
-            const h = getLogicalHeight();
+            const w = WIDTH();
+            const h = HEIGHT();
 
-            ctx.clearRect(0, 0, w, h);
+            ctx.fillStyle = '#1e90ff';
+            ctx.fillRect(0, 0, w, h);
 
-            // Background
             const grad = ctx.createLinearGradient(0, 0, 0, h);
             grad.addColorStop(0, '#1e90ff');
             grad.addColorStop(1, '#87ceeb');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, w, h);
 
-            drawPlatforms();
+            for (let p of platforms) {
+                const screenY = p.y - scrollY;
+                if (screenY > -30 && screenY < h + 30) {
+                    ctx.fillStyle = '#00aa44';
+                    ctx.fillRect(p.x, screenY, PLATFORM_WIDTH, PLATFORM_HEIGHT);
+                    ctx.fillStyle = '#ffd700';
+                    ctx.fillRect(p.x + 3, screenY, PLATFORM_WIDTH - 6, 5);
+                }
+            }
 
             if (gameState === 'playing') {
-                drawScore();
+                ctx.fillStyle = 'black';
+                ctx.font = 'bold 24px Arial';
+                ctx.fillText('Score: ' + score, 20, 40);
             }
 
             player.draw();
         }
 
-        // ========== LEADERBOARD ==========
         function loadLeaderboard() {
             const data = localStorage.getItem('leaderboard');
             return data ? JSON.parse(data) : [];
@@ -398,15 +345,13 @@
             localStorage.setItem('leaderboard', JSON.stringify(board));
         }
 
-        function addScore(name, score) {
+        function addScore(name, sc) {
             const board = loadLeaderboard();
-            board.push({ name, score, timestamp: Date.now() });
+            board.push({ name, score: sc, timestamp: Date.now() });
             board.sort((a, b) => b.score - a.score);
-            if (board.length > 5) {
-                board.pop();
-            }
+            if (board.length > 5) board.pop();
             saveLeaderboard(board);
-            lastEnteredLeaderboard = { name, score };
+            lastEnteredLeaderboard = { name, score: sc };
         }
 
         function displayLeaderboard() {
@@ -425,18 +370,13 @@
                     lastEnteredLeaderboard.score === entry.score;
 
                 const div = document.createElement('div');
-                div.className = `leaderboard-entry ${isLatest ? 'latest' : ''}`;
-                div.innerHTML = `
-                    <span class="rank">#${i + 1}</span>
-                    <span class="name">${entry.name}</span>
-                    <span class="score-value">${entry.score}</span>
-                `;
+                div.className = 'leaderboard-entry' + (isLatest ? ' latest' : '');
+                div.innerHTML = '<span class="rank">#' + (i + 1) + '</span><span class="name">' + entry.name + '</span><span class="score-value">' + entry.score + '</span>';
                 container.appendChild(div);
             });
             lastEnteredLeaderboard = null;
         }
 
-        // ========== UI SCREENS ==========
         function showScreen(screenId) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(screenId).classList.add('active');
@@ -445,9 +385,9 @@
         function startGame() {
             gameState = 'playing';
             score = 0;
-            scrollOffset = 0;
+            scrollY = 0;
             platforms = [];
-            nextPlatformY = 0;
+            nextY = 0;
 
             player.init();
             spawnPlatforms();
@@ -506,23 +446,16 @@
         }
 
         function clearLeaderboard() {
-            if (confirm('Clear all scores? This cannot be undone.')) {
+            if (confirm('Clear all scores?')) {
                 localStorage.removeItem('leaderboard');
                 lastEnteredLeaderboard = null;
                 displayLeaderboard();
             }
         }
 
-        // ========== INPUT ==========
-        let keysPressed = {};
-
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'ArrowLeft') {
-                if (gameState === 'playing') player.moveLeft();
-            }
-            if (e.code === 'ArrowRight') {
-                if (gameState === 'playing') player.moveRight();
-            }
+            if (e.code === 'ArrowLeft' && gameState === 'playing') player.moveLeft();
+            if (e.code === 'ArrowRight' && gameState === 'playing') player.moveRight();
             if (e.code === 'Space') {
                 e.preventDefault();
                 if (gameState === 'start') startGame();
@@ -530,52 +463,35 @@
         });
 
         document.addEventListener('keyup', (e) => {
-            if (e.code === 'ArrowLeft' || e.code === 'ArrowRight') {
-                if (gameState === 'playing') player.stopMove();
-            }
+            if ((e.code === 'ArrowLeft' || e.code === 'ArrowRight') && gameState === 'playing') player.stopMove();
         });
 
-        // Touch controls - left/right side of screen
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (gameState === 'start') {
-                startGame();
-                return;
-            }
-
+            if (gameState === 'start') startGame();
             if (gameState === 'playing') {
-                const touch = e.touches[0];
-                const w = getLogicalWidth();
-                if (touch.clientX < w / 3) {
-                    player.moveLeft();
-                } else if (touch.clientX > w * 2 / 3) {
-                    player.moveRight();
-                }
+                const w = WIDTH();
+                const x = e.touches[0].clientX;
+                if (x < w / 3) player.moveLeft();
+                else if (x > w * 2 / 3) player.moveRight();
             }
         });
 
         canvas.addEventListener('touchend', (e) => {
-            if (gameState === 'playing') {
-                player.stopMove();
-            }
+            if (gameState === 'playing') player.stopMove();
         });
 
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
             if (gameState === 'playing') {
-                const touch = e.touches[0];
-                const w = getLogicalWidth();
-                if (touch.clientX < w / 3) {
-                    player.moveLeft();
-                } else if (touch.clientX > w * 2 / 3) {
-                    player.moveRight();
-                } else {
-                    player.stopMove();
-                }
+                const w = WIDTH();
+                const x = e.touches[0].clientX;
+                if (x < w / 3) player.moveLeft();
+                else if (x > w * 2 / 3) player.moveRight();
+                else player.stopMove();
             }
         });
 
-        // ========== GAME LOOP ==========
         function gameLoop() {
             if (gameState === 'playing') {
                 const alive = player.update();
@@ -584,7 +500,7 @@
                 } else {
                     updateScroll();
                     spawnPlatforms();
-                    score = Math.floor(Math.max(0, scrollOffset) / 10);
+                    score = Math.max(0, Math.floor(Math.max(0, -nextY + HEIGHT() * 0.7) / 10));
                 }
             }
 
