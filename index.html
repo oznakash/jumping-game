@@ -149,7 +149,7 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <div id="version">v1.0.2</div>
+    <div id="version">v1.0.3</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -291,23 +291,38 @@
             if (!ctx) return;
 
             const melody = [
-                { freq: 220, duration: 0.5 },
-                { freq: 247, duration: 0.5 },
-                { freq: 294, duration: 0.5 },
-                { freq: 330, duration: 1 },
-                { freq: 294, duration: 0.5 },
-                { freq: 330, duration: 0.5 },
-                { freq: 392, duration: 1 },
-                { freq: 330, duration: 1 },
-                { freq: 349, duration: 0.5 },
-                { freq: 392, duration: 0.5 },
-                { freq: 440, duration: 1.5 },
-                { freq: 392, duration: 0.5 },
-                { freq: 349, duration: 0.5 },
-                { freq: 330, duration: 1 },
-                { freq: 294, duration: 0.5 },
-                { freq: 262, duration: 0.5 },
-                { freq: 220, duration: 2 },
+                // Original romantic melody in C Major, 90 BPM
+                // Bar 1: Soft opening (C E G)
+                { freq: 261.63, duration: 0.8 },   // C4
+                { freq: 329.63, duration: 0.8 },   // E4
+                { freq: 392.00, duration: 1.6 },   // G4
+                // Bar 2: Rising emotion (A G A)
+                { freq: 440.00, duration: 0.8 },   // A4
+                { freq: 392.00, duration: 0.8 },   // G4
+                { freq: 440.00, duration: 1.6 },   // A4
+                // Bar 3: Ascending (B A G)
+                { freq: 493.88, duration: 0.8 },   // B4
+                { freq: 440.00, duration: 0.8 },   // A4
+                { freq: 392.00, duration: 1.6 },   // G4
+                // Bar 4: Gentle dip (E F E)
+                { freq: 329.63, duration: 0.8 },   // E4
+                { freq: 349.23, duration: 0.8 },   // F4
+                { freq: 329.63, duration: 1.6 },   // E4
+                // Bar 5: Rising again (G A B)
+                { freq: 392.00, duration: 0.8 },   // G4
+                { freq: 440.00, duration: 0.8 },   // A4
+                { freq: 493.88, duration: 1.6 },   // B4
+                // Bar 6: Emotional peak (C5 whole note)
+                { freq: 523.25, duration: 3.2 },   // C5
+                // Bar 7: Descent (B A G)
+                { freq: 493.88, duration: 0.8 },   // B4
+                { freq: 440.00, duration: 0.8 },   // A4
+                { freq: 392.00, duration: 1.6 },   // G4
+                // Bar 8: Resolution (E C D C)
+                { freq: 329.63, duration: 0.8 },   // E4
+                { freq: 261.63, duration: 0.8 },   // C4
+                { freq: 293.66, duration: 0.8 },   // D4
+                { freq: 261.63, duration: 1.6 },   // C4 (coming home)
             ];
 
             function playMelody() {
