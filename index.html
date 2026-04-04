@@ -410,14 +410,6 @@
                     }
                 }
 
-                // Game over if player falls below visible screen + 1/2 screen buffer
-                // Visible screen: cameraY to cameraY + H()
-                // Game over at: cameraY + H() + (H() * 0.5)
-                const gameOverThreshold = cameraY + H() + (H() * 0.5);
-                if (this.y > gameOverThreshold) {
-                    return false;
-                }
-
                 return true;
             },
 
@@ -700,12 +692,15 @@
                 else if (rightPressed) player.moveRight();
                 else player.stopMove();
 
-                const alive = player.update();
-                if (!alive) {
+                player.update();
+                updateCamera();
+                spawnPlatforms();
+
+                // Check game over: player falls 1/2 screen height below visible screen
+                const gameOverThreshold = cameraY + H() + (H() * 0.5);
+                if (player.y > gameOverThreshold) {
                     endGame();
                 } else {
-                    updateCamera();
-                    spawnPlatforms();
                     maxHeightReached = Math.min(maxHeightReached, player.y);
                     score = Math.max(0, Math.floor((H() - 150 - maxHeightReached) / 20));
                     const newLevel = Math.min(MAX_LEVEL, Math.floor(score / LEVEL_POINTS) + 1);
