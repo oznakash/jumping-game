@@ -203,6 +203,96 @@
 
         const PLATFORM_ITEMS = ['❤️', '💍', '🎁', '💝', '✨'];
 
+        // ========== AUDIO ==========
+        let audioContext = null;
+        let oscillator = null;
+        let gainNode = null;
+        let isPlayingMusic = false;
+
+        function initAudio() {
+            if (!audioContext) {
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            }
+        }
+
+        function playGameMusic() {
+            if (isPlayingMusic) return;
+            isPlayingMusic = true;
+
+            initAudio();
+            if (audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
+            // Simple, nostalgic version of "Will Always Love You" melody
+            const melody = [
+                { freq: 220, duration: 0.5 }, // A3
+                { freq: 247, duration: 0.5 }, // B3
+                { freq: 294, duration: 0.5 }, // D4
+                { freq: 330, duration: 1 },   // E4
+                { freq: 294, duration: 0.5 }, // D4
+                { freq: 330, duration: 0.5 }, // E4
+                { freq: 392, duration: 1 },   // G4
+                { freq: 330, duration: 1 },   // E4
+                { freq: 349, duration: 0.5 }, // F4
+                { freq: 392, duration: 0.5 }, // G4
+                { freq: 440, duration: 1.5 }, // A4
+                { freq: 392, duration: 0.5 }, // G4
+                { freq: 349, duration: 0.5 }, // F4
+                { freq: 330, duration: 1 },   // E4
+                { freq: 294, duration: 0.5 }, // D4
+                { freq: 262, duration: 0.5 }, // C4
+                { freq: 220, duration: 2 },   // A3
+            ];
+
+            function playMelodyLoop() {
+                if (!isPlayingMusic) return;
+
+                let startTime = audioContext.currentTime;
+
+                melody.forEach((note) => {
+                    const time = startTime;
+                    startTime += note.duration * 0.8;
+
+                    gainNode = audioContext.createGain();
+                    oscillator = audioContext.createOscillator();
+
+                    oscillator.type = 'sine';
+                    oscillator.frequency.value = note.freq;
+
+                    gainNode.gain.setValueAtTime(0.15, time);
+                    gainNode.gain.exponentialRampToValueAtTime(0.01, time + note.duration * 0.8);
+
+                    oscillator.connect(gainNode);
+                    gainNode.connect(audioContext.destination);
+
+                    oscillator.start(time);
+                    oscillator.stop(time + note.duration * 0.8);
+                });
+
+                // Loop after melody ends
+                setTimeout(() => {
+                    if (isPlayingMusic) {
+                        playMelodyLoop();
+                    }
+                }, melody.reduce((sum, note) => sum + note.duration, 0) * 800 + 500);
+            }
+
+            playMelodyLoop();
+        }
+
+        function stopGameMusic() {
+            isPlayingMusic = false;
+            if (oscillator) {
+                try {
+                    oscillator.stop();
+                } catch (e) {}
+            }
+            if (gainNode) {
+                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            }
+        }
+
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
@@ -417,10 +507,16 @@
             spawnPlatforms();
 
             document.getElementById('ui').classList.remove('show');
+
+            // Start nostalgic background music
+            playGameMusic();
         }
 
         function endGame() {
             gameState = 'gameover';
+
+            // Stop nostalgic background music
+            stopGameMusic();
 
             if (score > bestScore) {
                 bestScore = score;
