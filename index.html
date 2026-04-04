@@ -386,8 +386,8 @@
                     }
                 }
 
-                // Game over if player falls more than half screen height below visible screen
-                if (this.y > cameraY + H() + H() / 2) {
+                // Game over if player falls approximately 1/2 screen below visible screen
+                if (this.y > cameraY + H() + H() * 0.4) {
                     return false;
                 }
 
@@ -418,8 +418,9 @@
 
             if (!w || !h || w === 0 || h === 0) return;
 
-            // Spawn platforms far ahead - always keep ahead of camera
-            while (nextPlatformY < cameraY + h * 5) {
+            // Spawn platforms infinitely far ahead to allow infinite climbing
+            const spawnDistance = Math.max(nextPlatformY + 5000, cameraY + h * 10);
+            while (nextPlatformY < spawnDistance) {
                 const x = Math.random() * Math.max(0, w - PLATFORM_W);
                 const gap = PLATFORM_GAP_MIN + Math.random() * (PLATFORM_GAP_MAX - PLATFORM_GAP_MIN);
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
@@ -428,8 +429,8 @@
                 nextPlatformY += gap;
             }
 
-            // Keep platforms visible - don't cull too aggressively
-            platforms = platforms.filter(p => p.y < cameraY + h * 4);
+            // Keep platforms that are visible or upcoming
+            platforms = platforms.filter(p => p.y < cameraY + h * 6);
         }
 
         function updateCamera() {
