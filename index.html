@@ -192,8 +192,8 @@
 
     <script>
         // ========== CONSTANTS ==========
-        const GRAVITY = 0.6;
-        const JUMP_VELOCITY = -12;
+        const GRAVITY = 0.5;
+        const JUMP_VELOCITY = -16;
         const INITIAL_WORLD_SPEED = 5;
         const SPEED_INCREASE_RATE = 0.0001;
         const PLAYER_WIDTH = 30;
@@ -287,9 +287,14 @@
         let obstacles = [];
 
         function spawnObstacle() {
+            // Vary obstacle heights to create climbing effect
+            const minHeight = getGroundY() - 150;
+            const maxHeight = getGroundY() - 20;
+            const randomY = minHeight + Math.random() * (maxHeight - minHeight);
+
             obstacles.push({
                 x: getLogicalWidth(),
-                y: getGroundY(),
+                y: randomY,
                 width: OBSTACLE_WIDTH,
                 height: OBSTACLE_HEIGHT,
             });
