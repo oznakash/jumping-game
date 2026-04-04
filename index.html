@@ -170,7 +170,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.9</div>
+    <div id="version">v1.0.10</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -415,7 +415,7 @@
 
             setTimeout(() => {
                 tipEl.classList.remove('show');
-            }, 3000);
+            }, 5000);
         }
 
         const canvas = document.getElementById('gameCanvas');
@@ -481,8 +481,8 @@
                         playBounceSound();
                         lastJumpY = this.y;  // Update last jump position
                         platformsJumped++;  // Increment platform counter
-                        // Show romantic tip every 2 platforms
-                        if (platformsJumped % 2 === 0) {
+                        // Show romantic tip every 3 platforms
+                        if (platformsJumped % 3 === 0) {
                             showRomanticTip();
                         }
                     }
