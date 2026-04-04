@@ -203,15 +203,42 @@
 
         const PLATFORM_ITEMS = ['❤️', '💍', '🎁', '💝', '✨'];
 
-        // ========== AUDIO ==========
+        // ========== AUDIO - "Will Always Love You" Melody ==========
         let audioContext = null;
-        let oscillator = null;
-        let gainNode = null;
         let isPlayingMusic = false;
+        let musicLoopTimeout = null;
 
         function initAudio() {
             if (!audioContext) {
-                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                try {
+                    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                } catch (e) {
+                    console.log('Audio not supported');
+                }
+            }
+            return audioContext;
+        }
+
+        function playNote(freq, startTime, duration) {
+            if (!audioContext) return;
+
+            try {
+                const osc = audioContext.createOscillator();
+                const gain = audioContext.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(freq, startTime);
+
+                gain.gain.setValueAtTime(0.12, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.02, startTime + duration);
+
+                osc.connect(gain);
+                gain.connect(audioContext.destination);
+
+                osc.start(startTime);
+                osc.stop(startTime + duration);
+            } catch (e) {
+                // Silently handle audio errors
             }
         }
 
@@ -219,77 +246,59 @@
             if (isPlayingMusic) return;
             isPlayingMusic = true;
 
-            initAudio();
-            if (audioContext.state === 'suspended') {
-                audioContext.resume();
+            const ctx = initAudio();
+            if (!ctx) return;
+
+            // Resume audio context if suspended (iOS requirement)
+            if (ctx.state === 'suspended') {
+                ctx.resume().catch(() => {});
             }
 
-            // Simple, nostalgic version of "Will Always Love You" melody
             const melody = [
-                { freq: 220, duration: 0.5 }, // A3
-                { freq: 247, duration: 0.5 }, // B3
-                { freq: 294, duration: 0.5 }, // D4
-                { freq: 330, duration: 1 },   // E4
-                { freq: 294, duration: 0.5 }, // D4
-                { freq: 330, duration: 0.5 }, // E4
-                { freq: 392, duration: 1 },   // G4
-                { freq: 330, duration: 1 },   // E4
-                { freq: 349, duration: 0.5 }, // F4
-                { freq: 392, duration: 0.5 }, // G4
-                { freq: 440, duration: 1.5 }, // A4
-                { freq: 392, duration: 0.5 }, // G4
-                { freq: 349, duration: 0.5 }, // F4
-                { freq: 330, duration: 1 },   // E4
-                { freq: 294, duration: 0.5 }, // D4
-                { freq: 262, duration: 0.5 }, // C4
-                { freq: 220, duration: 2 },   // A3
+                { freq: 220, duration: 0.5 },  // A3
+                { freq: 247, duration: 0.5 },  // B3
+                { freq: 294, duration: 0.5 },  // D4
+                { freq: 330, duration: 1 },    // E4
+                { freq: 294, duration: 0.5 },  // D4
+                { freq: 330, duration: 0.5 },  // E4
+                { freq: 392, duration: 1 },    // G4
+                { freq: 330, duration: 1 },    // E4
+                { freq: 349, duration: 0.5 },  // F4
+                { freq: 392, duration: 0.5 },  // G4
+                { freq: 440, duration: 1.5 },  // A4
+                { freq: 392, duration: 0.5 },  // G4
+                { freq: 349, duration: 0.5 },  // F4
+                { freq: 330, duration: 1 },    // E4
+                { freq: 294, duration: 0.5 },  // D4
+                { freq: 262, duration: 0.5 },  // C4
+                { freq: 220, duration: 2 },    // A3
             ];
 
-            function playMelodyLoop() {
+            function playMelody() {
                 if (!isPlayingMusic) return;
 
-                let startTime = audioContext.currentTime;
+                let currentTime = audioContext.currentTime;
 
                 melody.forEach((note) => {
-                    const time = startTime;
-                    startTime += note.duration * 0.8;
-
-                    gainNode = audioContext.createGain();
-                    oscillator = audioContext.createOscillator();
-
-                    oscillator.type = 'sine';
-                    oscillator.frequency.value = note.freq;
-
-                    gainNode.gain.setValueAtTime(0.15, time);
-                    gainNode.gain.exponentialRampToValueAtTime(0.01, time + note.duration * 0.8);
-
-                    oscillator.connect(gainNode);
-                    gainNode.connect(audioContext.destination);
-
-                    oscillator.start(time);
-                    oscillator.stop(time + note.duration * 0.8);
+                    playNote(note.freq, currentTime, note.duration * 0.9);
+                    currentTime += note.duration * 0.9;
                 });
 
-                // Loop after melody ends
-                setTimeout(() => {
-                    if (isPlayingMusic) {
-                        playMelodyLoop();
-                    }
-                }, melody.reduce((sum, note) => sum + note.duration, 0) * 800 + 500);
+                // Schedule next loop
+                const loopDuration = melody.reduce((sum, n) => sum + n.duration, 0) * 900 + 200;
+                musicLoopTimeout = setTimeout(() => {
+                    playMelody();
+                }, loopDuration);
             }
 
-            playMelodyLoop();
+            playMelody();
         }
 
         function stopGameMusic() {
             isPlayingMusic = false;
-            if (oscillator) {
-                try {
-                    oscillator.stop();
-                } catch (e) {}
-            }
-            if (gainNode) {
-                gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            if (musicLoopTimeout) {
+                clearTimeout(musicLoopTimeout);
+                musicLoopTimeout = null;
             }
         }
 
