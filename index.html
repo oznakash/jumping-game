@@ -149,7 +149,7 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <div id="version">v1.0.4</div>
+    <div id="version">v1.0.5</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -209,6 +209,7 @@
         const PLATFORM_GAP_MAX = 80;
         const LEVEL_POINTS = 100;
         const MAX_LEVEL = 14;
+        const FALLING_DISTANCE_MULTIPLIER = 1/3; // Game over after falling ~1/3 of screen height
 
         const PLATFORM_ITEMS = ['❤️', '💍', '🎁', '💝', '✨'];
 
@@ -696,10 +697,11 @@
                 updateCamera();
                 spawnPlatforms();
 
-                // Check game over: player falls below visible screen
+                // Check game over: player falls beyond threshold below visible screen
                 // Visible screen is from cameraY to cameraY + H()
-                // Game over when player falls below bottom of visible screen
-                if (player.y > cameraY + H()) {
+                // Game over when player falls (FALLING_DISTANCE_MULTIPLIER * H()) below screen bottom
+                const fallThreshold = cameraY + H() + (H() * FALLING_DISTANCE_MULTIPLIER);
+                if (player.y > fallThreshold) {
                     endGame();
                 } else {
                     maxHeightReached = Math.min(maxHeightReached, player.y);
