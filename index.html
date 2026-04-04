@@ -54,6 +54,26 @@
             color: #999;
             z-index: 100;
         }
+        #romanticTip {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 500;
+            font-style: italic;
+            padding: 15px 25px;
+            max-width: 90%;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+            z-index: 999;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+        }
+        #romanticTip.show {
+            opacity: 1;
+        }
         .screen { display: none; width: 100%; max-width: 600px; }
         .screen.active { display: block; }
         h1 { font-size: 2.5em; margin: 20px 0; color: #ff1493; }
@@ -149,7 +169,8 @@
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
-    <div id="version">v1.0.8</div>
+    <div id="romanticTip"></div>
+    <div id="version">v1.0.9</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -211,6 +232,59 @@
         const MAX_LEVEL = 14;
         const FALLING_DISTANCE_MULTIPLIER = 1/3; // Game over after falling ~1/3 of screen height
         const MUSIC_TEMPO = 120; // BPM for celebratory melody
+
+        const ROMANTIC_TIPS = [
+            "Tell her she's your greatest adventure",
+            "Give her a genuine compliment about her smile",
+            "Hold her hand just because",
+            "Remember the little things she loves",
+            "Kiss her forehead when she least expects it",
+            "Listen more than you speak",
+            "Make her favorite meal tonight",
+            "Dance with her in the kitchen",
+            "Write her a simple love note",
+            "Give her your full attention",
+            "Surprise her with flowers",
+            "Tell her what you admire about her",
+            "Make her laugh with an inside joke",
+            "Run your fingers through her hair",
+            "Take a walk together and hold hands",
+            "Send her a sweet message",
+            "Offer her a shoulder massage",
+            "Cook breakfast in bed for her",
+            "Tell her 'I love you' with meaning",
+            "Look into her eyes and smile",
+            "Plan a surprise date night",
+            "Leave her love notes around the house",
+            "Compliment something unique about her",
+            "Tell her how proud you are of her",
+            "Ask about her dreams and listen",
+            "Slow dance with her to your song",
+            "Give her space to be herself",
+            "Support her goals and celebrate wins",
+            "Be her biggest cheerleader",
+            "Tell her she makes you happy",
+            "Share your vulnerable side with her",
+            "Remember important moments together",
+            "Be patient and kind always",
+            "Surprise her with a love letter",
+            "Tell her she's beautiful inside and out",
+            "Create a playlist of your songs",
+            "Hold her close and just breathe",
+            "Pray or wish for her happiness",
+            "Tell her she makes life better",
+            "Be someone she can trust completely",
+            "Laugh at her jokes, even the bad ones",
+            "Bring her coffee the way she likes it",
+            "Tell her you choose her every day",
+            "Make eye contact and really listen",
+            "Tell her a memory you cherish",
+            "Give her butterflies with a kiss",
+            "Show her off to the world proudly",
+            "Be her safe place to fall",
+            "Tell her she's irreplaceable",
+            "Love her more than yesterday",
+        ];
 
         const PLATFORM_ITEMS = ['❤️', '💍', '🎁', '💝', '✨'];
 
@@ -293,8 +367,7 @@
             if (!ctx) return;
 
             const melody = [
-                // Celebratory melody inspired by party anthems - G Major, 120 BPM
-                // Similar feel to "Sweet Caroline" but with original note sequence
+                // Chorus: Catchy ascending-descending party anthem hook in G Major, 120 BPM
                 // Bar 1-2: Ascending hook (G A B D)
                 { freq: 392.00, duration: 0.5 },   // G4
                 { freq: 440.00, duration: 0.5 },   // A4
@@ -303,28 +376,7 @@
                 // Bar 3: Descending celebration (B A G)
                 { freq: 493.88, duration: 0.5 },   // B4
                 { freq: 440.00, duration: 0.5 },   // A4
-                { freq: 392.00, duration: 1.0 },   // G4
-                // Bar 4: Quick bounce back up (A B C D)
-                { freq: 440.00, duration: 0.4 },   // A4
-                { freq: 493.88, duration: 0.4 },   // B4
-                { freq: 523.25, duration: 0.4 },   // C5
-                { freq: 587.33, duration: 0.8 },   // D5
-                // Bar 5: Descending with rhythm (D C B A G)
-                { freq: 587.33, duration: 0.4 },   // D5
-                { freq: 523.25, duration: 0.4 },   // C5
-                { freq: 493.88, duration: 0.4 },   // B4
-                { freq: 440.00, duration: 0.4 },   // A4
-                { freq: 392.00, duration: 0.4 },   // G4
-                // Bar 6: High energetic moment (E D E)
-                { freq: 659.25, duration: 0.5 },   // E5
-                { freq: 587.33, duration: 0.5 },   // D5
-                { freq: 659.25, duration: 1.0 },   // E5
-                // Bar 7: Party descent (D C B)
-                { freq: 587.33, duration: 0.6 },   // D5
-                { freq: 523.25, duration: 0.6 },   // C5
-                { freq: 493.88, duration: 1.0 },   // B4
-                // Bar 8: Resolution (G)
-                { freq: 392.00, duration: 1.5 },   // G4 (finish strong)
+                { freq: 392.00, duration: 1.2 },   // G4 (home base)
             ];
 
             function playMelody() {
@@ -349,6 +401,21 @@
                 clearTimeout(musicLoopTimeout);
                 musicLoopTimeout = null;
             }
+        }
+
+        function showRomanticTip() {
+            const colors = ['#ff1493', '#ff69b4', '#ff6b9d', '#ffc0cb', '#ff8fab', '#ff10f0', '#ff0080', '#ec407a', '#e91e63', '#c2185b'];
+            const randomTip = ROMANTIC_TIPS[Math.floor(Math.random() * ROMANTIC_TIPS.length)];
+            const randomColor = colors[Math.floor(Math.random() * colors.length)];
+
+            const tipEl = document.getElementById('romanticTip');
+            tipEl.textContent = randomTip;
+            tipEl.style.color = randomColor;
+            tipEl.classList.add('show');
+
+            setTimeout(() => {
+                tipEl.classList.remove('show');
+            }, 3000);
         }
 
         const canvas = document.getElementById('gameCanvas');
@@ -380,6 +447,8 @@
         let lowestPlatformY = 0;
         let levelUpShown = {};
         let lastJumpY = 0;  // Track last platform jumped from for game over detection
+        let platformsJumped = 0;  // Counter for platforms jumped on
+        let lastTipShown = 0;  // Track last shown tip to avoid repeats
 
         const player = {
             x: 0,
@@ -411,6 +480,11 @@
                         this.vy = -JUMP_POWER;
                         playBounceSound();
                         lastJumpY = this.y;  // Update last jump position
+                        platformsJumped++;  // Increment platform counter
+                        // Show romantic tip every 2 platforms
+                        if (platformsJumped % 2 === 0) {
+                            showRomanticTip();
+                        }
                     }
                 }
 
@@ -559,13 +633,16 @@
             lowestPlatformY = 0;
             levelUpShown = {};
             lastJumpY = H() - 150;  // Initial spawn position
+            platformsJumped = 0;  // Reset platform counter
+            lastTipShown = 0;  // Reset tip tracker
 
             player.init();
             spawnPlatforms();
 
             document.getElementById('ui').classList.remove('show');
 
-            // Start nostalgic background music
+            // Stop any existing music and start fresh
+            stopGameMusic();
             playGameMusic();
         }
 
