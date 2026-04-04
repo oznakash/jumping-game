@@ -203,7 +203,7 @@
 
         const PLATFORM_ITEMS = ['❤️', '💍', '🎁', '💝', '✨'];
 
-        // ========== AUDIO - "Will Always Love You" Melody ==========
+        // ========== AUDIO - "Will Always Love You" Melody + Bounce Sound ==========
         let audioContext = null;
         let isPlayingMusic = false;
         let musicLoopTimeout = null;
@@ -212,33 +212,65 @@
             if (!audioContext) {
                 try {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    // Resume on first user interaction
+                    if (audioContext.state === 'suspended') {
+                        document.addEventListener('click', () => audioContext.resume(), { once: true });
+                        document.addEventListener('touchstart', () => audioContext.resume(), { once: true });
+                    }
                 } catch (e) {
-                    console.log('Audio not supported');
+                    return null;
                 }
             }
             return audioContext;
         }
 
         function playNote(freq, startTime, duration) {
-            if (!audioContext) return;
+            const ctx = initAudio();
+            if (!ctx) return;
 
             try {
-                const osc = audioContext.createOscillator();
-                const gain = audioContext.createGain();
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
 
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, startTime);
 
-                gain.gain.setValueAtTime(0.12, startTime);
-                gain.gain.exponentialRampToValueAtTime(0.02, startTime + duration);
+                gain.gain.setValueAtTime(0.15, startTime);
+                gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
 
                 osc.connect(gain);
-                gain.connect(audioContext.destination);
+                gain.connect(ctx.destination);
 
                 osc.start(startTime);
                 osc.stop(startTime + duration);
             } catch (e) {
-                // Silently handle audio errors
+                // Silently handle
+            }
+        }
+
+        function playBounceSound() {
+            const ctx = initAudio();
+            if (!ctx) return;
+
+            try {
+                const now = ctx.currentTime;
+                const osc = ctx.createOscillator();
+                const gain = ctx.createGain();
+
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(800, now);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0, now + 0.1);
+
+                osc.connect(gain);
+                gain.connect(ctx.destination);
+
+                osc.start(now);
+                osc.stop(now + 0.1);
+            } catch (e) {
+                // Silently handle
             }
         }
 
@@ -249,46 +281,37 @@
             const ctx = initAudio();
             if (!ctx) return;
 
-            // Resume audio context if suspended (iOS requirement)
-            if (ctx.state === 'suspended') {
-                ctx.resume().catch(() => {});
-            }
-
             const melody = [
-                { freq: 220, duration: 0.5 },  // A3
-                { freq: 247, duration: 0.5 },  // B3
-                { freq: 294, duration: 0.5 },  // D4
-                { freq: 330, duration: 1 },    // E4
-                { freq: 294, duration: 0.5 },  // D4
-                { freq: 330, duration: 0.5 },  // E4
-                { freq: 392, duration: 1 },    // G4
-                { freq: 330, duration: 1 },    // E4
-                { freq: 349, duration: 0.5 },  // F4
-                { freq: 392, duration: 0.5 },  // G4
-                { freq: 440, duration: 1.5 },  // A4
-                { freq: 392, duration: 0.5 },  // G4
-                { freq: 349, duration: 0.5 },  // F4
-                { freq: 330, duration: 1 },    // E4
-                { freq: 294, duration: 0.5 },  // D4
-                { freq: 262, duration: 0.5 },  // C4
-                { freq: 220, duration: 2 },    // A3
+                { freq: 220, duration: 0.5 },
+                { freq: 247, duration: 0.5 },
+                { freq: 294, duration: 0.5 },
+                { freq: 330, duration: 1 },
+                { freq: 294, duration: 0.5 },
+                { freq: 330, duration: 0.5 },
+                { freq: 392, duration: 1 },
+                { freq: 330, duration: 1 },
+                { freq: 349, duration: 0.5 },
+                { freq: 392, duration: 0.5 },
+                { freq: 440, duration: 1.5 },
+                { freq: 392, duration: 0.5 },
+                { freq: 349, duration: 0.5 },
+                { freq: 330, duration: 1 },
+                { freq: 294, duration: 0.5 },
+                { freq: 262, duration: 0.5 },
+                { freq: 220, duration: 2 },
             ];
 
             function playMelody() {
                 if (!isPlayingMusic) return;
 
-                let currentTime = audioContext.currentTime;
-
+                let currentTime = ctx.currentTime;
                 melody.forEach((note) => {
-                    playNote(note.freq, currentTime, note.duration * 0.9);
-                    currentTime += note.duration * 0.9;
+                    playNote(note.freq, currentTime, note.duration * 0.85);
+                    currentTime += note.duration * 0.85;
                 });
 
-                // Schedule next loop
-                const loopDuration = melody.reduce((sum, n) => sum + n.duration, 0) * 900 + 200;
-                musicLoopTimeout = setTimeout(() => {
-                    playMelody();
-                }, loopDuration);
+                const loopDuration = melody.reduce((sum, n) => sum + n.duration, 0) * 850 + 300;
+                musicLoopTimeout = setTimeout(playMelody, loopDuration);
             }
 
             playMelody();
@@ -359,11 +382,12 @@
 
                     if (this.vy > 0 && touchTop && touchX) {
                         this.vy = -JUMP_POWER;
+                        playBounceSound();
                     }
                 }
 
-                // Game over if player falls below visible screen + half screen height
-                if (this.y > cameraY + H() * 1.5) {
+                // Game over if player falls more than half screen height below visible screen
+                if (this.y > cameraY + H() + H() / 2) {
                     return false;
                 }
 
@@ -392,9 +416,11 @@
             const w = W();
             const h = H();
 
-            // Spawn platforms far ahead of camera
-            while (nextPlatformY < cameraY + h * 3) {
-                const x = Math.random() * (w - PLATFORM_W);
+            if (!w || !h || w === 0 || h === 0) return;
+
+            // Spawn platforms far ahead - always keep ahead of camera
+            while (nextPlatformY < cameraY + h * 5) {
+                const x = Math.random() * Math.max(0, w - PLATFORM_W);
                 const gap = PLATFORM_GAP_MIN + Math.random() * (PLATFORM_GAP_MAX - PLATFORM_GAP_MIN);
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
 
@@ -403,7 +429,7 @@
             }
 
             // Keep platforms visible - don't cull too aggressively
-            platforms = platforms.filter(p => p.y < cameraY + h * 2);
+            platforms = platforms.filter(p => p.y < cameraY + h * 4);
         }
 
         function updateCamera() {
