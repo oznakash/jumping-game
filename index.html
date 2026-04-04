@@ -2,22 +2,29 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover, user-scalable=no">
     <title>Anniversary Run - 14 Years</title>
     <style>
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
+            -webkit-user-select: none;
+            user-select: none;
         }
-        body {
+        html, body {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
-            background: #1a1a1a;
+            background: #000;
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
         }
         canvas {
             display: block;
+            width: 100%;
+            height: 100%;
             touch-action: none;
+            -webkit-touch-callout: none;
         }
         #ui {
             display: none;
@@ -26,7 +33,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.92);
+            background: rgba(0,0,0,0.95);
             color: white;
             z-index: 1000;
             padding: 20px;
@@ -39,66 +46,39 @@
             justify-content: center;
             text-align: center;
         }
-        .screen {
-            display: none;
-            width: 100%;
-            max-width: 600px;
-        }
-        .screen.active {
-            display: block;
-        }
-        h1 {
-            font-size: 3em;
-            margin: 20px 0;
-            background: linear-gradient(135deg, #ff1493, #ff69b4);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-        h2 {
-            font-size: 2em;
-            margin: 15px 0;
-        }
-        p, .subtitle {
-            font-size: 1.2em;
-            margin: 10px 0;
-            line-height: 1.6;
-        }
-        .subtitle {
-            color: #ffb6c1;
-            font-size: 1.1em;
-        }
+        .screen { display: none; width: 100%; max-width: 600px; }
+        .screen.active { display: block; }
+        h1 { font-size: 2.5em; margin: 20px 0; color: #ff1493; }
+        h2 { font-size: 2em; margin: 15px 0; }
+        p { font-size: 1.1em; margin: 10px 0; line-height: 1.6; }
         button {
-            padding: 15px 40px;
-            font-size: 1.2em;
-            margin: 10px;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            margin: 8px;
             border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            background: linear-gradient(135deg, #ff1493, #ff69b4);
+            border-radius: 6px;
+            background: #ff1493;
             color: white;
             font-weight: bold;
-            transition: transform 0.2s;
+            cursor: pointer;
         }
-        button:active {
-            transform: scale(0.95);
-        }
+        button:active { transform: scale(0.95); }
         input {
-            padding: 12px;
-            font-size: 1.1em;
+            padding: 10px;
+            font-size: 1em;
             border: 2px solid #ff69b4;
-            border-radius: 8px;
+            border-radius: 6px;
             text-align: center;
             margin: 10px 0;
             width: 100%;
             max-width: 300px;
         }
         .score-display {
-            font-size: 1.5em;
+            font-size: 1.3em;
             margin: 20px 0;
             background: rgba(255,105,180,0.2);
             padding: 15px;
-            border-radius: 8px;
+            border-radius: 6px;
         }
         .leaderboard {
             width: 100%;
@@ -109,39 +89,30 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px;
-            margin: 8px 0;
+            padding: 10px;
+            margin: 6px 0;
             background: rgba(255,105,180,0.1);
-            border-radius: 6px;
-            border-left: 4px solid #ff69b4;
+            border-radius: 4px;
+            border-left: 3px solid #ff69b4;
         }
         .leaderboard-entry.latest {
             background: rgba(255,215,0,0.2);
             border-left-color: #ffd700;
         }
-        .rank {
-            font-weight: bold;
-            min-width: 40px;
-        }
-        .name {
-            flex: 1;
-            margin: 0 15px;
-            text-align: left;
-        }
-        .score-value {
-            font-weight: bold;
-        }
+        .rank { font-weight: bold; min-width: 35px; }
+        .name { flex: 1; margin: 0 10px; text-align: left; }
+        .score-value { font-weight: bold; }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="ui">
         <div id="startScreen" class="screen active">
-            <h1>Anniversary Run</h1>
-            <p class="subtitle">Celebrating 14 Years of Oz ❤️ Caroline</p>
-            <p style="margin-top: 40px; font-size: 1.1em;">Tap left/right side or use arrow keys<br>Jump on platforms and reach the top!</p>
-            <button onclick="startGame()">Play Game</button>
-            <button onclick="showLeaderboard()">Leaderboard</button>
+            <h1>🎉 Anniversary Run</h1>
+            <p style="color: #ffb6c1;">Celebrating 14 Years ❤️ Oz & Caroline</p>
+            <p style="margin-top: 30px; margin-bottom: 30px;">Tap left/right to move<br>Jump on platforms to climb higher!</p>
+            <button onclick="startGame()">Play</button>
+            <button onclick="showLeaderboard()">Scores</button>
         </div>
 
         <div id="gameOverScreen" class="screen">
@@ -151,191 +122,172 @@
                 <div>Best: <span id="bestScore">0</span></div>
             </div>
             <div id="nameInputContainer" style="display:none;">
-                <p>🎉 New High Score! 🎉</p>
-                <input type="text" id="playerName" placeholder="Enter your name" maxlength="12">
+                <p>🎉 High Score! 🎉</p>
+                <input type="text" id="playerName" placeholder="Your name" maxlength="12">
             </div>
             <button onclick="continueAfterGameOver()">Continue</button>
         </div>
 
         <div id="leaderboardScreen" class="screen">
-            <h2>🏆 Top Scores 🏆</h2>
+            <h2>🏆 High Scores 🏆</h2>
             <div class="leaderboard" id="leaderboardList"></div>
-            <button onclick="clearLeaderboard()">Clear Scores</button>
             <button onclick="playAgain()">Play Again</button>
-            <button onclick="backToStart()">Back to Start</button>
+            <button onclick="clearLeaderboard()">Clear</button>
+            <button onclick="backToStart()">Back</button>
         </div>
     </div>
 
     <script>
-        const GRAVITY = 0.4;
-        const JUMP_VELOCITY = -14;
-        const PLAYER_WIDTH = 30;
-        const PLAYER_HEIGHT = 40;
-        const PLATFORM_WIDTH = 60;
-        const PLATFORM_HEIGHT = 12;
-        const MIN_PLATFORM_GAP = 70;
-        const MAX_PLATFORM_GAP = 110;
+        // Constants
+        const GRAVITY = 0.3;
+        const JUMP_POWER = 11;
+        const PLAYER_W = 24;
+        const PLAYER_H = 32;
+        const PLATFORM_W = 50;
+        const PLATFORM_H = 10;
+        const PLATFORM_GAP_MIN = 50;
+        const PLATFORM_GAP_MAX = 80;
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
 
-        function resizeCanvas() {
-            const dpr = window.devicePixelRatio || 1;
+        let dpr = window.devicePixelRatio || 1;
+
+        function resize() {
+            dpr = window.devicePixelRatio || 1;
             canvas.width = window.innerWidth * dpr;
             canvas.height = window.innerHeight * dpr;
             ctx.scale(dpr, dpr);
-            canvas.style.width = window.innerWidth + 'px';
-            canvas.style.height = window.innerHeight + 'px';
         }
-        resizeCanvas();
-        window.addEventListener('resize', resizeCanvas);
+        resize();
+        window.addEventListener('resize', resize);
 
-        const WIDTH = () => canvas.width / (window.devicePixelRatio || 1);
-        const HEIGHT = () => canvas.height / (window.devicePixelRatio || 1);
+        const W = () => canvas.width / dpr;
+        const H = () => canvas.height / dpr;
 
         let gameState = 'start';
         let score = 0;
-        let bestScore = localStorage.getItem('bestScore') ? parseInt(localStorage.getItem('bestScore')) : 0;
-        let scrollY = 0;
-        let lastEnteredLeaderboard = null;
+        let bestScore = parseInt(localStorage.getItem('bestScore') || 0);
+        let lastLeader = null;
+
+        // Game world
+        let cameraY = 0;
+        let platforms = [];
+        let nextPlatformY = 0;
+        let maxHeightReached = 0;
 
         const player = {
             x: 0,
-            worldY: 0,
-            velocityY: 0,
-            velocityX: 0,
-            canJump: false,
+            y: 0,
+            vy: 0,
+            vx: 0,
 
             init() {
-                this.x = WIDTH() / 2 - PLAYER_WIDTH / 2;
-                this.worldY = HEIGHT() * 0.7;
-                this.velocityY = 0;
-                this.velocityX = 0;
-                this.canJump = true;
+                this.x = W() / 2 - PLAYER_W / 2;
+                this.y = H() - 150;
+                this.vy = -JUMP_POWER;
+                this.vx = 0;
             },
 
             update() {
-                this.velocityY += GRAVITY;
-                this.worldY += this.velocityY;
-                this.x += this.velocityX;
+                this.vy += GRAVITY;
+                this.y += this.vy;
+                this.x += this.vx;
 
-                const w = WIDTH();
-                if (this.x < 0) this.x = w;
-                if (this.x > w) this.x = 0;
+                // Wrap around
+                const w = W();
+                if (this.x < -PLAYER_W) this.x = w;
+                if (this.x > w) this.x = -PLAYER_W;
 
-                this.canJump = false;
-
+                // Check collisions
                 for (let p of platforms) {
-                    if (this.velocityY >= 0 &&
-                        this.worldY + PLAYER_HEIGHT >= p.y &&
-                        this.worldY + PLAYER_HEIGHT <= p.y + PLATFORM_HEIGHT + 10 &&
-                        this.x + PLAYER_WIDTH > p.x &&
-                        this.x < p.x + PLATFORM_WIDTH) {
-                        this.velocityY = JUMP_VELOCITY;
-                        this.canJump = true;
+                    const touchTop = this.y + PLAYER_H >= p.y && this.y + PLAYER_H <= p.y + PLATFORM_H + 15;
+                    const touchX = this.x + PLAYER_W > p.x && this.x < p.x + PLATFORM_W;
+
+                    if (this.vy > 0 && touchTop && touchX) {
+                        this.vy = -JUMP_POWER;
                     }
                 }
 
-                if (this.worldY > scrollY + HEIGHT() + 100) {
-                    return false;
-                }
-
-                if (this.worldY < scrollY - 100) {
+                // Game over if fallen
+                if (this.y > cameraY + H() + 100) {
                     return false;
                 }
 
                 return true;
             },
 
-            moveLeft() {
-                this.velocityX = -5;
-            },
-
-            moveRight() {
-                this.velocityX = 5;
-            },
-
-            stopMove() {
-                this.velocityX = 0;
-            },
+            moveLeft() { this.vx = -5; },
+            moveRight() { this.vx = 5; },
+            stopMove() { this.vx = 0; },
 
             draw() {
-                const screenY = this.worldY - scrollY;
+                const sy = this.y - cameraY;
                 ctx.fillStyle = '#ff1493';
-                ctx.fillRect(this.x, screenY, PLAYER_WIDTH, PLAYER_HEIGHT);
+                ctx.fillRect(this.x, sy, PLAYER_W, PLAYER_H);
 
-                ctx.fillStyle = 'white';
-                ctx.fillRect(this.x + 8, screenY + 8, 6, 6);
-                ctx.fillRect(this.x + 16, screenY + 8, 6, 6);
-                ctx.fillStyle = 'black';
-                ctx.fillRect(this.x + 9, screenY + 9, 4, 4);
-                ctx.fillRect(this.x + 17, screenY + 9, 4, 4);
+                ctx.fillStyle = '#fff';
+                ctx.fillRect(this.x + 6, sy + 6, 4, 4);
+                ctx.fillRect(this.x + 14, sy + 6, 4, 4);
+                ctx.fillStyle = '#000';
+                ctx.fillRect(this.x + 7, sy + 7, 2, 2);
+                ctx.fillRect(this.x + 15, sy + 7, 2, 2);
             }
         };
 
-        let platforms = [];
-        let nextY = 0;
-
         function spawnPlatforms() {
-            const h = HEIGHT();
-            const w = WIDTH();
+            const w = W();
+            const h = H();
 
-            while (nextY > scrollY - 200) {
-                const x = Math.random() * (w - PLATFORM_WIDTH);
-                platforms.push({
-                    x: x,
-                    y: nextY
-                });
+            while (nextPlatformY < cameraY + h + 500) {
+                const x = Math.random() * (w - PLATFORM_W);
+                const gap = PLATFORM_GAP_MIN + Math.random() * (PLATFORM_GAP_MAX - PLATFORM_GAP_MIN);
 
-                const gap = MIN_PLATFORM_GAP + Math.random() * (MAX_PLATFORM_GAP - MIN_PLATFORM_GAP);
-                nextY -= gap;
+                platforms.push({ x, y: nextPlatformY });
+                nextPlatformY += gap;
             }
 
-            platforms = platforms.filter(p => p.y < scrollY + h + 200);
+            platforms = platforms.filter(p => p.y < cameraY + h + 500);
         }
 
-        function updateScroll() {
-            const targetScreenY = HEIGHT() * 0.7;
-            const diff = player.worldY - (scrollY + targetScreenY);
-
-            if (diff > 0) {
-                scrollY += diff;
-                player.worldY = scrollY + targetScreenY;
-            }
+        function updateCamera() {
+            const targetY = Math.max(0, player.y - H() * 0.3);
+            cameraY = targetY;
         }
 
-        function render() {
-            const w = WIDTH();
-            const h = HEIGHT();
+        function drawGame() {
+            const w = W();
+            const h = H();
 
-            ctx.fillStyle = '#1e90ff';
-            ctx.fillRect(0, 0, w, h);
-
+            // Sky
             const grad = ctx.createLinearGradient(0, 0, 0, h);
             grad.addColorStop(0, '#1e90ff');
             grad.addColorStop(1, '#87ceeb');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, w, h);
 
+            // Platforms
+            ctx.fillStyle = '#00bb00';
             for (let p of platforms) {
-                const screenY = p.y - scrollY;
-                if (screenY > -30 && screenY < h + 30) {
-                    ctx.fillStyle = '#00aa44';
-                    ctx.fillRect(p.x, screenY, PLATFORM_WIDTH, PLATFORM_HEIGHT);
-                    ctx.fillStyle = '#ffd700';
-                    ctx.fillRect(p.x + 3, screenY, PLATFORM_WIDTH - 6, 5);
+                const sy = p.y - cameraY;
+                if (sy > -50 && sy < h + 50) {
+                    ctx.fillRect(p.x, sy, PLATFORM_W, PLATFORM_H);
+                    ctx.fillStyle = '#ffdd00';
+                    ctx.fillRect(p.x + 2, sy, PLATFORM_W - 4, 3);
+                    ctx.fillStyle = '#00bb00';
                 }
             }
 
-            if (gameState === 'playing') {
-                ctx.fillStyle = 'black';
-                ctx.font = 'bold 24px Arial';
-                ctx.fillText('Score: ' + score, 20, 40);
-            }
+            // Score
+            ctx.fillStyle = '#000';
+            ctx.font = 'bold 24px Arial';
+            ctx.fillText('Score: ' + score, 15, 40);
 
+            // Player
             player.draw();
         }
 
+        // Leaderboard
         function loadLeaderboard() {
             const data = localStorage.getItem('leaderboard');
             return data ? JSON.parse(data) : [];
@@ -347,47 +299,45 @@
 
         function addScore(name, sc) {
             const board = loadLeaderboard();
-            board.push({ name, score: sc, timestamp: Date.now() });
+            board.push({ name, score: sc });
             board.sort((a, b) => b.score - a.score);
-            if (board.length > 5) board.pop();
+            board.splice(5);
             saveLeaderboard(board);
-            lastEnteredLeaderboard = { name, score: sc };
+            lastLeader = { name, score: sc };
         }
 
         function displayLeaderboard() {
             const board = loadLeaderboard();
-            const container = document.getElementById('leaderboardList');
-            container.innerHTML = '';
+            const el = document.getElementById('leaderboardList');
+            el.innerHTML = '';
 
-            if (board.length === 0) {
-                container.innerHTML = '<p style="text-align: center; padding: 40px;">No scores yet. Play to join!</p>';
+            if (!board.length) {
+                el.innerHTML = '<p style="padding:40px;text-align:center;">Play to rank!</p>';
                 return;
             }
 
-            board.forEach((entry, i) => {
-                const isLatest = lastEnteredLeaderboard &&
-                    lastEnteredLeaderboard.name === entry.name &&
-                    lastEnteredLeaderboard.score === entry.score;
-
+            board.forEach((e, i) => {
                 const div = document.createElement('div');
-                div.className = 'leaderboard-entry' + (isLatest ? ' latest' : '');
-                div.innerHTML = '<span class="rank">#' + (i + 1) + '</span><span class="name">' + entry.name + '</span><span class="score-value">' + entry.score + '</span>';
-                container.appendChild(div);
+                div.className = 'leaderboard-entry' + (lastLeader && lastLeader.name === e.name ? ' latest' : '');
+                div.innerHTML = `<span class="rank">#${i+1}</span><span class="name">${e.name}</span><span class="score-value">${e.score}</span>`;
+                el.appendChild(div);
             });
-            lastEnteredLeaderboard = null;
+            lastLeader = null;
         }
 
-        function showScreen(screenId) {
+        // UI
+        function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-            document.getElementById(screenId).classList.add('active');
+            document.getElementById(id).classList.add('active');
         }
 
         function startGame() {
             gameState = 'playing';
             score = 0;
-            scrollY = 0;
+            cameraY = 0;
             platforms = [];
-            nextY = 0;
+            nextPlatformY = 0;
+            maxHeightReached = 0;
 
             player.init();
             spawnPlatforms();
@@ -422,9 +372,9 @@
         }
 
         function continueAfterGameOver() {
-            const nameInput = document.getElementById('playerName');
+            const input = document.getElementById('playerName');
             if (document.getElementById('nameInputContainer').style.display !== 'none') {
-                const name = (nameInput.value || 'Player').substring(0, 12);
+                const name = (input.value || 'Player').substring(0, 12);
                 addScore(name, score);
             }
             showLeaderboard();
@@ -446,65 +396,73 @@
         }
 
         function clearLeaderboard() {
-            if (confirm('Clear all scores?')) {
+            if (confirm('Clear scores?')) {
                 localStorage.removeItem('leaderboard');
-                lastEnteredLeaderboard = null;
+                lastLeader = null;
                 displayLeaderboard();
             }
         }
 
+        // Input
+        let leftPressed = false, rightPressed = false;
+
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'ArrowLeft' && gameState === 'playing') player.moveLeft();
-            if (e.code === 'ArrowRight' && gameState === 'playing') player.moveRight();
-            if (e.code === 'Space') {
-                e.preventDefault();
-                if (gameState === 'start') startGame();
-            }
+            if (e.code === 'ArrowLeft') { leftPressed = true; e.preventDefault(); }
+            if (e.code === 'ArrowRight') { rightPressed = true; e.preventDefault(); }
+            if (e.code === 'Space' && gameState === 'start') { e.preventDefault(); startGame(); }
         });
 
         document.addEventListener('keyup', (e) => {
-            if ((e.code === 'ArrowLeft' || e.code === 'ArrowRight') && gameState === 'playing') player.stopMove();
+            if (e.code === 'ArrowLeft') leftPressed = false;
+            if (e.code === 'ArrowRight') rightPressed = false;
         });
 
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (gameState === 'start') startGame();
+            if (gameState === 'start') { startGame(); return; }
             if (gameState === 'playing') {
-                const w = WIDTH();
-                const x = e.touches[0].clientX;
-                if (x < w / 3) player.moveLeft();
-                else if (x > w * 2 / 3) player.moveRight();
+                const x = e.touches[0].clientX / dpr;
+                const w = W();
+                if (x < w * 0.4) leftPressed = true;
+                else if (x > w * 0.6) rightPressed = true;
             }
-        });
-
-        canvas.addEventListener('touchend', (e) => {
-            if (gameState === 'playing') player.stopMove();
-        });
+        }, false);
 
         canvas.addEventListener('touchmove', (e) => {
             e.preventDefault();
             if (gameState === 'playing') {
-                const w = WIDTH();
-                const x = e.touches[0].clientX;
-                if (x < w / 3) player.moveLeft();
-                else if (x > w * 2 / 3) player.moveRight();
-                else player.stopMove();
+                const x = e.touches[0].clientX / dpr;
+                const w = W();
+                leftPressed = (x < w * 0.4);
+                rightPressed = (x > w * 0.6);
             }
-        });
+        }, false);
 
+        canvas.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            leftPressed = false;
+            rightPressed = false;
+        }, false);
+
+        // Game loop
         function gameLoop() {
             if (gameState === 'playing') {
+                if (leftPressed) player.moveLeft();
+                else if (rightPressed) player.moveRight();
+                else player.stopMove();
+
                 const alive = player.update();
                 if (!alive) {
                     endGame();
                 } else {
-                    updateScroll();
+                    updateCamera();
                     spawnPlatforms();
-                    score = Math.max(0, Math.floor(Math.max(0, -nextY + HEIGHT() * 0.7) / 10));
+                    maxHeightReached = Math.min(maxHeightReached, player.y);
+                    score = Math.max(0, Math.floor((H() - 150 - maxHeightReached) / 20));
                 }
             }
 
-            render();
+            drawGame();
             requestAnimationFrame(gameLoop);
         }
 
