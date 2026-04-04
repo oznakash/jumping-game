@@ -102,15 +102,62 @@
         .rank { font-weight: bold; min-width: 35px; }
         .name { flex: 1; margin: 0 10px; text-align: left; }
         .score-value { font-weight: bold; }
+        #levelUp {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(0,0,0,0.9);
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            z-index: 2000;
+            border: 3px solid #ff1493;
+        }
+        #levelUp.show {
+            display: block;
+            animation: popIn 0.5s ease-out;
+        }
+        #levelUp h1 {
+            font-size: 3em;
+            margin: 20px 0;
+        }
+        #levelUp .gift {
+            font-size: 4em;
+            margin: 20px 0;
+            animation: bounce 0.6s ease-out;
+        }
+        @keyframes popIn {
+            0% { transform: translate(-50%, -50%) scale(0.5); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+        @keyframes bounce {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-30px); }
+            100% { transform: translateY(0); }
+        }
     </style>
 </head>
 <body>
     <canvas id="gameCanvas"></canvas>
+    <div id="levelUp">
+        <h1 id="levelUpText">Year 1 🎉</h1>
+        <div class="gift">🎁</div>
+    </div>
     <div id="ui">
-        <div id="startScreen" class="screen active">
+        <div id="introScreen" class="screen active">
+            <h1>🎉 Anniversary Run</h1>
+            <p style="color: #ffb6c1; font-size: 1.3em; margin-top: 30px;">Celebrating 14 Years ❤️</p>
+            <p style="margin-top: 40px;">Congrats on making it this far!<br><br>Can you reach 14 years together?</p>
+            <p style="margin-top: 30px; font-size: 0.9em; color: #aaa;">Each level = 1 year<br>Collect gifts as you climb!</p>
+            <button onclick="startGame()">Start</button>
+        </div>
+
+        <div id="startScreen" class="screen">
             <h1>🎉 Anniversary Run</h1>
             <p style="color: #ffb6c1;">Celebrating 14 Years ❤️ Oz & Caroline</p>
-            <p style="margin-top: 30px; margin-bottom: 30px;">Tap left/right to move<br>Jump on platforms to climb higher!</p>
+            <p style="margin-top: 30px; margin-bottom: 30px;">Tap left/right to move<br>Jump on platforms to climb!</p>
             <button onclick="startGame()">Play</button>
             <button onclick="showLeaderboard()">Scores</button>
         </div>
@@ -118,6 +165,7 @@
         <div id="gameOverScreen" class="screen">
             <h2>Game Over</h2>
             <div class="score-display">
+                <div>Year Reached: <span id="finalLevel">1</span></div>
                 <div>Score: <span id="finalScore">0</span></div>
                 <div>Best: <span id="bestScore">0</span></div>
             </div>
@@ -138,7 +186,6 @@
     </div>
 
     <script>
-        // Constants
         const GRAVITY = 0.3;
         const JUMP_POWER = 11;
         const PLAYER_W = 24;
@@ -147,6 +194,10 @@
         const PLATFORM_H = 10;
         const PLATFORM_GAP_MIN = 50;
         const PLATFORM_GAP_MAX = 80;
+        const LEVEL_POINTS = 100;
+        const MAX_LEVEL = 14;
+
+        const PLATFORM_ITEMS = ['❤️', '💍', '🎁', '💝', '✨'];
 
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -165,16 +216,17 @@
         const W = () => canvas.width / dpr;
         const H = () => canvas.height / dpr;
 
-        let gameState = 'start';
+        let gameState = 'intro';
         let score = 0;
+        let level = 1;
         let bestScore = parseInt(localStorage.getItem('bestScore') || 0);
         let lastLeader = null;
-
-        // Game world
         let cameraY = 0;
         let platforms = [];
         let nextPlatformY = 0;
         let maxHeightReached = 0;
+        let lowestPlatformY = 0;
+        let levelUpShown = {};
 
         const player = {
             x: 0,
@@ -194,12 +246,10 @@
                 this.y += this.vy;
                 this.x += this.vx;
 
-                // Wrap around
                 const w = W();
                 if (this.x < -PLAYER_W) this.x = w;
                 if (this.x > w) this.x = -PLAYER_W;
 
-                // Check collisions
                 for (let p of platforms) {
                     const touchTop = this.y + PLAYER_H >= p.y && this.y + PLAYER_H <= p.y + PLATFORM_H + 15;
                     const touchX = this.x + PLAYER_W > p.x && this.x < p.x + PLATFORM_W;
@@ -209,7 +259,6 @@
                     }
                 }
 
-                // Game over if fallen
                 if (this.y > cameraY + H() + 100) {
                     return false;
                 }
@@ -239,15 +288,22 @@
             const w = W();
             const h = H();
 
-            while (nextPlatformY < cameraY + h + 500) {
+            while (nextPlatformY < cameraY + h + 600) {
                 const x = Math.random() * (w - PLATFORM_W);
                 const gap = PLATFORM_GAP_MIN + Math.random() * (PLATFORM_GAP_MAX - PLATFORM_GAP_MIN);
+                const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
 
-                platforms.push({ x, y: nextPlatformY });
+                platforms.push({ x, y: nextPlatformY, item });
                 nextPlatformY += gap;
             }
 
-            platforms = platforms.filter(p => p.y < cameraY + h + 500);
+            platforms = platforms.filter(p => {
+                if (p.y < cameraY - 200) {
+                    lowestPlatformY = Math.max(lowestPlatformY, p.y);
+                    return false;
+                }
+                return true;
+            });
         }
 
         function updateCamera() {
@@ -259,14 +315,12 @@
             const w = W();
             const h = H();
 
-            // Sky
             const grad = ctx.createLinearGradient(0, 0, 0, h);
             grad.addColorStop(0, '#1e90ff');
             grad.addColorStop(1, '#87ceeb');
             ctx.fillStyle = grad;
             ctx.fillRect(0, 0, w, h);
 
-            // Platforms
             ctx.fillStyle = '#00bb00';
             for (let p of platforms) {
                 const sy = p.y - cameraY;
@@ -274,20 +328,34 @@
                     ctx.fillRect(p.x, sy, PLATFORM_W, PLATFORM_H);
                     ctx.fillStyle = '#ffdd00';
                     ctx.fillRect(p.x + 2, sy, PLATFORM_W - 4, 3);
+
+                    ctx.font = '20px Arial';
+                    ctx.fillText(p.item, p.x + PLATFORM_W / 2 - 10, sy + 25);
+
                     ctx.fillStyle = '#00bb00';
                 }
             }
 
-            // Score
             ctx.fillStyle = '#000';
-            ctx.font = 'bold 24px Arial';
-            ctx.fillText('Score: ' + score, 15, 40);
+            ctx.font = 'bold 20px Arial';
+            ctx.fillText('Year: ' + level, 15, 35);
+            ctx.fillText('Score: ' + score, 15, 60);
 
-            // Player
             player.draw();
         }
 
-        // Leaderboard
+        function showLevelUp(newLevel) {
+            if (!levelUpShown[newLevel]) {
+                levelUpShown[newLevel] = true;
+                const el = document.getElementById('levelUp');
+                document.getElementById('levelUpText').textContent = `Year ${newLevel} 🎉`;
+                el.classList.add('show');
+                setTimeout(() => {
+                    el.classList.remove('show');
+                }, 1500);
+            }
+        }
+
         function loadLeaderboard() {
             const data = localStorage.getItem('leaderboard');
             return data ? JSON.parse(data) : [];
@@ -325,7 +393,6 @@
             lastLeader = null;
         }
 
-        // UI
         function showScreen(id) {
             document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
             document.getElementById(id).classList.add('active');
@@ -334,10 +401,13 @@
         function startGame() {
             gameState = 'playing';
             score = 0;
+            level = 1;
             cameraY = 0;
             platforms = [];
             nextPlatformY = 0;
             maxHeightReached = 0;
+            lowestPlatformY = 0;
+            levelUpShown = {};
 
             player.init();
             spawnPlatforms();
@@ -353,6 +423,7 @@
                 localStorage.setItem('bestScore', bestScore);
             }
 
+            document.getElementById('finalLevel').textContent = level;
             document.getElementById('finalScore').textContent = score;
             document.getElementById('bestScore').textContent = bestScore;
 
@@ -403,13 +474,16 @@
             }
         }
 
-        // Input
         let leftPressed = false, rightPressed = false;
 
         document.addEventListener('keydown', (e) => {
             if (e.code === 'ArrowLeft') { leftPressed = true; e.preventDefault(); }
             if (e.code === 'ArrowRight') { rightPressed = true; e.preventDefault(); }
-            if (e.code === 'Space' && gameState === 'start') { e.preventDefault(); startGame(); }
+            if (e.code === 'Space') {
+                e.preventDefault();
+                if (gameState === 'intro') startGame();
+                else if (gameState === 'start') startGame();
+            }
         });
 
         document.addEventListener('keyup', (e) => {
@@ -419,12 +493,20 @@
 
         canvas.addEventListener('touchstart', (e) => {
             e.preventDefault();
-            if (gameState === 'start') { startGame(); return; }
+            if (gameState === 'intro' || gameState === 'start') {
+                startGame();
+                return;
+            }
             if (gameState === 'playing') {
                 const x = e.touches[0].clientX / dpr;
                 const w = W();
-                if (x < w * 0.4) leftPressed = true;
-                else if (x > w * 0.6) rightPressed = true;
+                if (x < w * 0.35) {
+                    leftPressed = true;
+                    rightPressed = false;
+                } else if (x > w * 0.65) {
+                    rightPressed = true;
+                    leftPressed = false;
+                }
             }
         }, false);
 
@@ -433,8 +515,16 @@
             if (gameState === 'playing') {
                 const x = e.touches[0].clientX / dpr;
                 const w = W();
-                leftPressed = (x < w * 0.4);
-                rightPressed = (x > w * 0.6);
+                if (x < w * 0.35) {
+                    leftPressed = true;
+                    rightPressed = false;
+                } else if (x > w * 0.65) {
+                    rightPressed = true;
+                    leftPressed = false;
+                } else {
+                    leftPressed = false;
+                    rightPressed = false;
+                }
             }
         }, false);
 
@@ -444,7 +534,6 @@
             rightPressed = false;
         }, false);
 
-        // Game loop
         function gameLoop() {
             if (gameState === 'playing') {
                 if (leftPressed) player.moveLeft();
@@ -459,6 +548,14 @@
                     spawnPlatforms();
                     maxHeightReached = Math.min(maxHeightReached, player.y);
                     score = Math.max(0, Math.floor((H() - 150 - maxHeightReached) / 20));
+                    const newLevel = Math.min(MAX_LEVEL, Math.floor(score / LEVEL_POINTS) + 1);
+
+                    if (newLevel > level) {
+                        level = newLevel;
+                        if (level <= MAX_LEVEL) {
+                            showLevelUp(level);
+                        }
+                    }
                 }
             }
 
