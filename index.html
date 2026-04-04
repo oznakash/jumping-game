@@ -169,7 +169,7 @@
         <div id="gameOverScreen" class="screen">
             <h2>Game Over</h2>
             <div class="score-display">
-                <div>Year Reached: <span id="finalLevel">1</span></div>
+                <div>Anniversary Reached: <span id="finalLevel">1</span> 🎁</div>
                 <div>Score: <span id="finalScore">0</span></div>
                 <div>Best: <span id="bestScore">0</span></div>
             </div>
@@ -362,7 +362,8 @@
                     }
                 }
 
-                if (this.y > cameraY + H() + 100) {
+                // Game over if player falls half screen height below camera
+                if (this.y > cameraY + H() / 2) {
                     return false;
                 }
 
@@ -391,7 +392,8 @@
             const w = W();
             const h = H();
 
-            while (nextPlatformY < cameraY + h + 600) {
+            // Spawn platforms far ahead of camera
+            while (nextPlatformY < cameraY + h * 3) {
                 const x = Math.random() * (w - PLATFORM_W);
                 const gap = PLATFORM_GAP_MIN + Math.random() * (PLATFORM_GAP_MAX - PLATFORM_GAP_MIN);
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
@@ -400,13 +402,8 @@
                 nextPlatformY += gap;
             }
 
-            platforms = platforms.filter(p => {
-                if (p.y < cameraY - 200) {
-                    lowestPlatformY = Math.max(lowestPlatformY, p.y);
-                    return false;
-                }
-                return true;
-            });
+            // Keep platforms visible - don't cull too aggressively
+            platforms = platforms.filter(p => p.y < cameraY + h * 2);
         }
 
         function updateCamera() {
@@ -441,7 +438,7 @@
 
             ctx.fillStyle = '#000';
             ctx.font = 'bold 20px Arial';
-            ctx.fillText('Year: ' + level, 15, 35);
+            ctx.fillText('Anniversary ' + level + '🎁', 15, 35);
             ctx.fillText('Score: ' + score, 15, 60);
 
             player.draw();
@@ -451,7 +448,7 @@
             if (!levelUpShown[newLevel]) {
                 levelUpShown[newLevel] = true;
                 const el = document.getElementById('levelUp');
-                document.getElementById('levelUpText').textContent = `Year ${newLevel} 🎉`;
+                document.getElementById('levelUpText').textContent = `Anniversary ${newLevel} 🎉`;
                 el.classList.add('show');
                 setTimeout(() => {
                     el.classList.remove('show');
@@ -673,6 +670,9 @@
         }
 
         gameLoop();
+
+        // Show intro screen on load
+        document.getElementById('ui').classList.add('show');
     </script>
 </body>
 </html>
