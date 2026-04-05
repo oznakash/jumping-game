@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.39</div>
+    <div id="version">v1.0.40</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -635,6 +635,7 @@
                     const touchX = this.x + PLAYER_W > p.x && this.x < p.x + PLATFORM_W;
 
                     if (this.vy > 0 && touchTop && touchX) {
+                        console.log('Platform collision detected! vy:', this.vy, 'touchTop:', touchTop, 'touchX:', touchX);
                         this.vy = -JUMP_POWER;
                         playBounceSound();
                         lastJumpY = this.y;  // Update last jump position
