@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.30</div>
+    <div id="version">v1.0.31</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -611,7 +611,7 @@
 
             init() {
                 this.x = W() / 2 - PLAYER_W / 2;
-                this.y = H() - 150;
+                this.y = H() * 0.4;
                 this.vy = -JUMP_POWER;
                 this.vx = 0;
             },
@@ -788,11 +788,11 @@
             level = 1;
             cameraY = 0;
             platforms = [];
-            nextPlatformY = H() - 150 - 80;  // Start just above player's spawn position
+            nextPlatformY = H() * 0.4 - 80;  // Start just above player's spawn position (40% height)
             maxHeightReached = Infinity;
             lowestPlatformY = 0;
             levelUpShown = {};
-            lastJumpY = H() - 150;  // Initial spawn position
+            lastJumpY = H() * 0.4;  // Initial spawn position at 40% height
             platformsJumped = 0;  // Reset platform counter
             lastTipShown = 0;  // Reset tip tracker
             currentCharacter = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];  // Random character
