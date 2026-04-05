@@ -668,8 +668,7 @@
 
             if (!w || !h || w === 0 || h === 0) return;
 
-            // Always spawn platforms well ahead of camera (15 screen heights ahead)
-            // Use Math.min because Y values are negative (moving up)
+            // Spawn platforms upward until we're 15 screen heights above camera
             const spawnTarget = cameraY - h * 15;
 
             while (nextPlatformY > spawnTarget) {
@@ -678,10 +677,10 @@
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
 
                 platforms.push({ x, y: nextPlatformY, item });
-                nextPlatformY -= gap;  // Subtract gap because we're moving up (negative direction)
+                nextPlatformY -= gap;  // Subtract to move upward (decreasing Y)
             }
 
-            // Keep platforms that are visible or upcoming (10 screen heights above and below camera)
+            // Keep platforms that are visible or upcoming (10 screen heights above and 2 below camera)
             platforms = platforms.filter(p => p.y > cameraY - h * 10 && p.y < cameraY + h * 2);
         }
 
@@ -789,7 +788,7 @@
             level = 1;
             cameraY = 0;
             platforms = [];
-            nextPlatformY = -2000;  // Start negative to spawn platforms above Y=0
+            nextPlatformY = H() - 150 - 80;  // Start just above player's spawn position
             maxHeightReached = Infinity;
             lowestPlatformY = 0;
             levelUpShown = {};
