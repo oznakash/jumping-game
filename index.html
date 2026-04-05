@@ -783,23 +783,35 @@
                     masterGain.connect(audioContext.destination);
                     // Resume on first user interaction
                     if (audioContext.state === 'suspended') {
-                        document.addEventListener('click', () => audioContext.resume(), { once: true });
-                        document.addEventListener('touchstart', () => audioContext.resume(), { once: true });
+                        const resumeAudio = () => {
+                            if (audioContext.state === 'suspended') {
+                                audioContext.resume();
+                            }
+                        };
+                        document.addEventListener('click', resumeAudio);
+                        document.addEventListener('touchstart', resumeAudio);
                     }
                 } catch (e) {
                     return null;
                 }
             }
+
+            // Ensure audio context is resumed if suspended
+            if (audioContext && audioContext.state === 'suspended') {
+                audioContext.resume();
+            }
+
             return audioContext;
         }
 
         function setMasterVolume() {
-            if (!audioContext) return;
+            // Initialize audio context if needed
+            initAudio();
+
+            if (!audioContext || !masterGain) return;
             const volumePercent = currentSettings.soundVolume || 100;
             const volumeGain = volumePercent / 100; // Convert 0-100 to 0-1
-            if (masterGain) {
-                masterGain.gain.setValueAtTime(volumeGain, audioContext.currentTime);
-            }
+            masterGain.gain.setValueAtTime(volumeGain, audioContext.currentTime);
         }
 
         function playNote(freq, startTime, duration) {
