@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.42</div>
+    <div id="version">v1.0.43</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -370,6 +370,27 @@
             '🏔️ lodge', '🏝️ island', '🗽 tour', '🏔️ trek', '🎷 jazz', '🍖 bbq', '🍣 sushi',
             '🍝 pasta', '🥘 tapas', '💑 date', '🥐 brunch', '☕ cafe', '🎮 game', '🎨 paint'
         ];
+
+        // ========== POWER-UP SYSTEM ==========
+        const POWER_UP_TYPES = {
+            SHIELD: { id: 'shield', emoji: '🛡️', prob: 0.04, color: '#ff4444' },
+            ROCKET: { id: 'rocket', emoji: '🚀', prob: 0.04, color: '#ff8844' },
+            SCORE2X: { id: 'score2x', emoji: '💎', prob: 0.03, color: '#ffff44' },
+            LOVE_BOMB: { id: 'love', emoji: '💕', prob: 0.02, color: '#ff44ff' },
+            SOUND_BOOST: { id: 'sound', emoji: '🎵', prob: 0.02, color: '#4444ff' }
+        };
+
+        const POWER_UP_SPAWN_RATE = 0.15; // Total 15% chance per platform
+        const MAX_ACTIVE_POWER_UPS = 50;
+
+        // Power-up game state
+        let powerUps = [];
+        let playerShielded = false;
+        let rocketActive = false;
+        let rocketJumpsRemaining = 0;
+        let scoreMultiplier = 1;
+        let multiplierPointsRemaining = 0;
+        let activePowerUpEffects = {};
 
         // ========== AUDIO - "Will Always Love You" Melody + Bounce Sound ==========
         let audioContext = null;
@@ -661,14 +682,44 @@
 
                     if (this.vy > 0 && touchTop && touchX) {
                         console.log('Platform collision detected! vy:', this.vy, 'touchTop:', touchTop, 'touchX:', touchX);
-                        this.vy = -JUMP_POWER;
+
+                        // Handle shield (one free jump on fall)
+                        if (!playerShielded) {
+                            this.vy = -JUMP_POWER;
+                        } else {
+                            playerShielded = false;
+                            activePowerUpEffects.shield = null;
+                            console.log('Shield used!');
+                        }
+
                         playBounceSound();
                         lastJumpY = this.y;  // Update last jump position
                         platformsJumped++;  // Increment platform counter
+
+                        // Handle rocket (increased jump height)
+                        if (rocketActive && rocketJumpsRemaining > 0) {
+                            this.vy = -JUMP_POWER * 1.5; // 50% increased height
+                            rocketJumpsRemaining--;
+                            if (rocketJumpsRemaining === 0) {
+                                rocketActive = false;
+                                activePowerUpEffects.rocket = null;
+                            }
+                        }
+
                         // Show romantic tip every 3 platforms
                         if (platformsJumped % 3 === 0) {
                             showRomanticTip();
                         }
+                    }
+                }
+
+                // Check power-up pickups
+                for (let pu of powerUps) {
+                    const puTouchX = this.x + PLAYER_W > pu.x && this.x < pu.x + 24;
+                    const puTouchY = this.y + PLAYER_H >= pu.y && this.y < pu.y + 24;
+
+                    if (puTouchX && puTouchY && !pu.isCollected) {
+                        applyPowerUpEffect(pu);
                     }
                 }
 
@@ -723,6 +774,141 @@
 
             // Keep platforms that are visible or upcoming (25 screen heights above and 3 below camera - matches spawn distance)
             platforms = platforms.filter(p => p.y > cameraY - h * 25 && p.y < cameraY + h * 3);
+
+            // Spawn power-ups on platforms
+            spawnPowerUpsOnPlatforms();
+
+            // Cleanup off-screen power-ups
+            cleanupPowerUps();
+        }
+
+        function spawnPowerUpsOnPlatforms() {
+            try {
+                // Only spawn power-ups on newly created platforms (those not yet processed)
+                platforms.forEach(p => {
+                    if (!p.hasPowerUp && Math.random() < POWER_UP_SPAWN_RATE) {
+                        p.hasPowerUp = true;
+
+                        // Select random power-up type based on probability
+                        const rand = Math.random();
+                        let selectedType = POWER_UP_TYPES.SHIELD;
+                        let cumProb = 0;
+
+                        for (const typeKey in POWER_UP_TYPES) {
+                            const type = POWER_UP_TYPES[typeKey];
+                            cumProb += type.prob;
+                            if (rand < cumProb) {
+                                selectedType = type;
+                                break;
+                            }
+                        }
+
+                        // Create power-up object
+                        const powerUp = {
+                            id: 'pu_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
+                            type: selectedType.id,
+                            x: p.x + PLATFORM_W / 2 - 12, // Center on platform
+                            y: p.y - 20, // Above platform
+                            isCollected: false,
+                            effectApplied: false,
+                            spawnTime: Date.now(),
+                            platformY: p.y
+                        };
+
+                        // Validate coordinates
+                        if (!isNaN(powerUp.x) && !isNaN(powerUp.y) && isFinite(powerUp.x) && isFinite(powerUp.y)) {
+                            powerUps.push(powerUp);
+                        }
+                    }
+                });
+            } catch (e) {
+                console.error('Power-up spawn error:', e);
+            }
+        }
+
+        function cleanupPowerUps() {
+            try {
+                const h = H();
+                const maxY = cameraY + h * 5;
+                const minY = cameraY - h * 25;
+
+                // Remove collected or off-screen power-ups
+                powerUps = powerUps.filter(pu => {
+                    return !pu.isCollected && pu.y > minY && pu.y < maxY && powerUps.length <= MAX_ACTIVE_POWER_UPS;
+                });
+            } catch (e) {
+                console.error('Power-up cleanup error:', e);
+            }
+        }
+
+        function applyPowerUpEffect(powerUp) {
+            try {
+                if (powerUp.isCollected || powerUp.effectApplied) return;
+
+                powerUp.isCollected = true;
+                powerUp.effectApplied = true;
+
+                const type = powerUp.type;
+
+                if (type === 'shield') {
+                    playerShielded = true;
+                    activePowerUpEffects.shield = { startTime: Date.now() };
+                    playPowerUpSound('shield');
+                } else if (type === 'rocket') {
+                    rocketActive = true;
+                    rocketJumpsRemaining = 5;
+                    activePowerUpEffects.rocket = { startTime: Date.now(), jumpsRemaining: 5 };
+                    playPowerUpSound('rocket');
+                } else if (type === 'score2x') {
+                    scoreMultiplier = 2;
+                    multiplierPointsRemaining = 10;
+                    activePowerUpEffects.score2x = { startTime: Date.now(), pointsRemaining: 10 };
+                    playPowerUpSound('score2x');
+                } else if (type === 'love') {
+                    score += 50;
+                    activePowerUpEffects.love = { startTime: Date.now() };
+                    playPowerUpSound('love');
+                } else if (type === 'sound') {
+                    playPowerUpSound('sound');
+                    activePowerUpEffects.sound = { startTime: Date.now() };
+                }
+
+                console.log('Power-up applied:', type);
+            } catch (e) {
+                console.error('Power-up effect error:', e);
+            }
+        }
+
+        function playPowerUpSound(type) {
+            try {
+                const audioCtx = initAudio();
+                if (!audioCtx) return;
+
+                setTimeout(() => {
+                    const now = audioCtx.currentTime;
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    let freq = 800, duration = 0.15;
+                    if (type === 'shield') freq = 600;
+                    else if (type === 'rocket') freq = 1000;
+                    else if (type === 'score2x') freq = 1200;
+                    else if (type === 'love') freq = 800;
+                    else if (type === 'sound') freq = 1400;
+
+                    osc.frequency.setValueAtTime(freq, now);
+                    osc.frequency.exponentialRampToValueAtTime(freq * 0.8, now + duration);
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0, now + duration);
+
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.start(now);
+                    osc.stop(now + duration);
+                }, 50);
+            } catch (e) {
+                console.error('Power-up sound error:', e);
+            }
         }
 
         function updateCamera() {
@@ -768,6 +954,62 @@
             ctx.font = 'bold 12px Arial';
             ctx.fillStyle = currentFps < 55 ? '#ff6666' : '#000';
             ctx.fillText('FPS: ' + currentFps, 15, 80);
+
+            // Draw power-ups
+            for (let pu of powerUps) {
+                if (!pu.isCollected) {
+                    const puy = pu.y - cameraY;
+                    if (puy > -30 && puy < h + 30) {
+                        try {
+                            // Get emoji for this power-up type
+                            let emoji = '⚡';
+                            for (const typeKey in POWER_UP_TYPES) {
+                                if (POWER_UP_TYPES[typeKey].id === pu.type) {
+                                    emoji = POWER_UP_TYPES[typeKey].emoji;
+                                    break;
+                                }
+                            }
+
+                            // Draw glow effect
+                            const glowSize = 15 + Math.sin(Date.now() / 200) * 3;
+                            ctx.fillStyle = 'rgba(255, 255, 100, 0.3)';
+                            ctx.beginPath();
+                            ctx.arc(pu.x + 12, puy + 12, glowSize, 0, Math.PI * 2);
+                            ctx.fill();
+
+                            // Draw emoji
+                            ctx.font = '24px Arial';
+                            ctx.textAlign = 'center';
+                            ctx.textBaseline = 'middle';
+                            ctx.fillText(emoji, pu.x + 12, puy + 12);
+                        } catch (e) {
+                            console.error('Power-up rendering error:', e);
+                        }
+                    }
+                }
+            }
+
+            // Draw power-up effects indicator
+            if (playerShielded || rocketActive || scoreMultiplier > 1) {
+                ctx.font = 'bold 14px Arial';
+                ctx.textAlign = 'right';
+                let effectY = 35;
+
+                if (playerShielded) {
+                    ctx.fillStyle = '#ff4444';
+                    ctx.fillText('🛡️ SHIELD', w - 20, effectY);
+                    effectY += 20;
+                }
+                if (rocketActive) {
+                    ctx.fillStyle = '#ff8844';
+                    ctx.fillText(`🚀 ROCKET (${rocketJumpsRemaining})`, w - 20, effectY);
+                    effectY += 20;
+                }
+                if (scoreMultiplier > 1) {
+                    ctx.fillStyle = '#ffff44';
+                    ctx.fillText(`💎 2x SCORE`, w - 20, effectY);
+                }
+            }
 
             player.draw();
         }
@@ -844,6 +1086,15 @@
             lastTipShown = 0;  // Reset tip tracker
             currentCharacter = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];  // Random character
 
+            // Reset power-up effects
+            powerUps = [];
+            playerShielded = false;
+            rocketActive = false;
+            rocketJumpsRemaining = 0;
+            scoreMultiplier = 1;
+            multiplierPointsRemaining = 0;
+            activePowerUpEffects = {};
+
             player.init();
 
             // Add starting platform in the middle directly below player
@@ -874,6 +1125,15 @@
 
             // Stop nostalgic background music
             stopGameMusic();
+
+            // Reset power-up effects
+            powerUps = [];
+            playerShielded = false;
+            rocketActive = false;
+            rocketJumpsRemaining = 0;
+            scoreMultiplier = 1;
+            multiplierPointsRemaining = 0;
+            activePowerUpEffects = {};
 
             if (score > bestScore) {
                 bestScore = score;
@@ -1016,7 +1276,19 @@
                         endGame();
                     } else {
                         maxHeightReached = Math.min(maxHeightReached, player.y);
-                        score = Math.max(0, Math.floor((H() * 0.4 - maxHeightReached) / 20));
+                        let baseScore = Math.max(0, Math.floor((H() * 0.4 - maxHeightReached) / 20));
+
+                        // Apply score multiplier if active
+                        if (scoreMultiplier > 1 && multiplierPointsRemaining > 0) {
+                            baseScore = baseScore * scoreMultiplier;
+                            multiplierPointsRemaining -= baseScore / scoreMultiplier;
+                            if (multiplierPointsRemaining <= 0) {
+                                scoreMultiplier = 1;
+                                activePowerUpEffects.score2x = null;
+                            }
+                        }
+
+                        score = baseScore;
                         const newLevel = Math.min(MAX_LEVEL, Math.floor(score / LEVEL_POINTS) + 1);
 
                         if (newLevel > level) {
