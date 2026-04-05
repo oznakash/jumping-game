@@ -110,14 +110,14 @@
         }
         .activity-suggestion {
             font-size: 1em;
-            margin: 20px 0;
-            background: rgba(255,192,203,0.15);
-            padding: 15px;
-            border-radius: 6px;
-            border-left: 4px solid #ff1493;
+            margin: 20px auto;
+            background: linear-gradient(135deg, rgba(255,192,203,0.25) 0%, rgba(255,105,180,0.15) 100%);
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 5px solid #ff1493;
+            border: 2px solid #ff69b4;
             max-width: 500px;
-            margin-left: auto;
-            margin-right: auto;
+            box-shadow: 0 4px 6px rgba(255,105,180,0.2);
         }
         .leaderboard {
             width: 100%;
@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.14</div>
+    <div id="version">v1.0.15</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -226,7 +226,7 @@
             </div>
             <div class="activity-suggestion">
                 <p style="font-size: 0.9em; margin-bottom: 10px; color: #ff69b4;">💕 Tonight's Activity Suggestion 💕</p>
-                <p id="suggestionText" style="font-size: 1.1em; font-weight: bold; color: #ff1493; min-height: 40px;"></p>
+                <p id="suggestionText" style="font-size: 1.2em; font-weight: bold; color: #ff1493; min-height: 50px; word-wrap: break-word; line-height: 1.4;">Loading...</p>
             </div>
             <div id="nameInputContainer" style="display:none;">
                 <p>🎉 High Score! 🎉</p>
@@ -759,7 +759,10 @@
 
             // Get and display activity suggestion based on score
             const activity = getAnniversaryActivity(score);
-            document.getElementById('suggestionText').textContent = activity;
+            const suggestionEl = document.getElementById('suggestionText');
+            if (suggestionEl && activity) {
+                suggestionEl.textContent = activity;
+            }
 
             const board = loadLeaderboard();
             const qualifies = board.length < 5 || score > board[4].score;
