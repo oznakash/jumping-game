@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.19</div>
+    <div id="version">v1.0.25</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -393,12 +393,12 @@
         }
 
         function playNote(freq, startTime, duration) {
-            const ctx = initAudio();
-            if (!ctx || freq === 0) return; // Skip rests (freq = 0)
+            const audioCtx = initAudio();
+            if (!audioCtx || freq === 0) return; // Skip rests (freq = 0)
 
             try {
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
 
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(freq, startTime);
@@ -407,7 +407,7 @@
                 gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
 
                 osc.connect(gain);
-                gain.connect(ctx.destination);
+                gain.connect(audioCtx.destination);
 
                 osc.start(startTime);
                 osc.stop(startTime + duration);
@@ -417,13 +417,13 @@
         }
 
         function playBounceSound() {
-            const ctx = initAudio();
+            const audioCtx = initAudio();
             if (!ctx) return;
 
             try {
-                const now = ctx.currentTime;
-                const osc = ctx.createOscillator();
-                const gain = ctx.createGain();
+                const now = audioCtx.currentTime;
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
 
                 osc.type = 'sine';
                 osc.frequency.setValueAtTime(800, now);
@@ -433,7 +433,7 @@
                 gain.gain.exponentialRampToValueAtTime(0, now + 0.1);
 
                 osc.connect(gain);
-                gain.connect(ctx.destination);
+                gain.connect(audioCtx.destination);
 
                 osc.start(now);
                 osc.stop(now + 0.1);
@@ -446,7 +446,7 @@
             if (isPlayingMusic) return;
             isPlayingMusic = true;
 
-            const ctx = initAudio();
+            const audioCtx = initAudio();
             if (!ctx) return;
 
             const melody = [
@@ -515,7 +515,7 @@
             function playMelody() {
                 if (!isPlayingMusic) return;
 
-                let currentTime = ctx.currentTime;
+                let currentTime = audioCtx.currentTime;
                 melody.forEach((note) => {
                     playNote(note.freq, currentTime, note.duration * 0.85);
                     currentTime += note.duration * 0.85;
