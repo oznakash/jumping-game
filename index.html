@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.33</div>
+    <div id="version">v1.0.34</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -810,6 +810,15 @@
             currentCharacter = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];  // Random character
 
             player.init();
+
+            // Add starting platform in the middle directly below player
+            const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
+            platforms.push({
+                x: W() / 2 - PLATFORM_W / 2,
+                y: H() * 0.4 + 50,
+                item
+            });
+
             spawnPlatforms();
 
             document.getElementById('ui').classList.remove('show');
