@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.43</div>
+    <div id="version">v1.0.44</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -377,10 +377,11 @@
             ROCKET: { id: 'rocket', emoji: '🚀', prob: 0.04, color: '#ff8844' },
             SCORE2X: { id: 'score2x', emoji: '💎', prob: 0.03, color: '#ffff44' },
             LOVE_BOMB: { id: 'love', emoji: '💕', prob: 0.02, color: '#ff44ff' },
-            SOUND_BOOST: { id: 'sound', emoji: '🎵', prob: 0.02, color: '#4444ff' }
+            SOUND_BOOST: { id: 'sound', emoji: '🎵', prob: 0.02, color: '#4444ff' },
+            BOMB: { id: 'bomb', emoji: '💣', prob: 0.04, color: '#333333' }
         };
 
-        const POWER_UP_SPAWN_RATE = 0.15; // Total 15% chance per platform
+        const POWER_UP_SPAWN_RATE = 0.19; // Total 19% chance per platform (15% + 4% bomb)
         const MAX_ACTIVE_POWER_UPS = 50;
 
         // Power-up game state
@@ -871,6 +872,11 @@
                 } else if (type === 'sound') {
                     playPowerUpSound('sound');
                     activePowerUpEffects.sound = { startTime: Date.now() };
+                } else if (type === 'bomb') {
+                    // Reduce score by 50, but not below 0
+                    score = Math.max(0, score - 50);
+                    activePowerUpEffects.bomb = { startTime: Date.now() };
+                    playPowerUpSound('bomb');
                 }
 
                 console.log('Power-up applied:', type);
@@ -895,6 +901,7 @@
                     else if (type === 'score2x') freq = 1200;
                     else if (type === 'love') freq = 800;
                     else if (type === 'sound') freq = 1400;
+                    else if (type === 'bomb') { freq = 300; duration = 0.25; } // Low, long explosion sound
 
                     osc.frequency.setValueAtTime(freq, now);
                     osc.frequency.exponentialRampToValueAtTime(freq * 0.8, now + duration);
