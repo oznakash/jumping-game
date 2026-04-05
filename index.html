@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.44</div>
+    <div id="version">v1.0.45</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -239,8 +239,154 @@
             <h2>🏆 High Scores 🏆</h2>
             <div class="leaderboard" id="leaderboardList"></div>
             <button onclick="playAgain()">Play Again</button>
+            <button onclick="showSettings()">⚙️ Settings</button>
             <button onclick="clearLeaderboard()">Clear</button>
             <button onclick="backToStart()">Back</button>
+        </div>
+
+        <div id="settingsScreen" class="screen">
+            <h2>⚙️ Game Settings ⚙️</h2>
+
+            <!-- Gameplay Section -->
+            <div style="margin-top: 25px; padding: 15px; background: rgba(255,105,180,0.1); border-radius: 8px; border-left: 4px solid #ff69b4;">
+                <h3 style="font-size: 1.3em; margin-bottom: 15px;">🎮 Gameplay</h3>
+
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Gravity Strength: <span id="gravityValue">0.3</span></label>
+                    <input type="range" id="gravitySlider" min="0.1" max="0.6" step="0.05" value="0.3" style="width: 100%;" onchange="updateSettings()">
+                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 3px;">Lower = easier, Higher = harder</div>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Jump Power: <span id="jumpPowerValue">11</span></label>
+                    <input type="range" id="jumpPowerSlider" min="8" max="14" step="0.5" value="11" style="width: 100%;" onchange="updateSettings()">
+                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 3px;">Lower = easier, Higher = harder</div>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Platform Gap Size: <span id="platformGapValue">50-80</span></label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                        <div>
+                            <label style="font-size: 0.9em;">Min: <span id="gapMinValue">50</span></label>
+                            <input type="range" id="gapMinSlider" min="30" max="70" step="5" value="50" style="width: 100%;" onchange="updateSettings()">
+                        </div>
+                        <div>
+                            <label style="font-size: 0.9em;">Max: <span id="gapMaxValue">80</span></label>
+                            <input type="range" id="gapMaxSlider" min="70" max="120" step="5" value="80" style="width: 100%;" onchange="updateSettings()">
+                        </div>
+                    </div>
+                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 5px;">Larger gaps = harder jumps</div>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Game Speed Multiplier: <span id="speedMultValue">1.0x</span></label>
+                    <input type="range" id="speedMultSlider" min="0.7" max="1.5" step="0.1" value="1.0" style="width: 100%;" onchange="updateSettings()">
+                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 3px;">Affects fall and jump speeds</div>
+                </div>
+            </div>
+
+            <!-- Power-Ups & Collectibles Section -->
+            <div style="margin-top: 25px; padding: 15px; background: rgba(255,192,203,0.1); border-radius: 8px; border-left: 4px solid #ffb6c1;">
+                <h3 style="font-size: 1.3em; margin-bottom: 15px;">💎 Power-Ups & Collectibles</h3>
+
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Power-Up Spawn Rate: <span id="spawnRateValue">19%</span></label>
+                    <input type="range" id="spawnRateSlider" min="8" max="35" step="1" value="19" style="width: 100%;" onchange="updateSettings()">
+                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 3px;">Higher = more power-ups appear</div>
+                </div>
+            </div>
+
+            <!-- Audio & Visual Section -->
+            <div style="margin-top: 25px; padding: 15px; background: rgba(147,112,219,0.1); border-radius: 8px; border-left: 4px solid #9370db;">
+                <h3 style="font-size: 1.3em; margin-bottom: 15px;">🎵 Audio & Visual</h3>
+
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Sound Effects Volume: <span id="soundVolValue">100%</span></label>
+                    <input type="range" id="soundVolSlider" min="0" max="100" step="10" value="100" style="width: 100%;" onchange="updateSettings()">
+                    <div style="font-size: 0.85em; color: #9370db; margin-top: 3px;">0% = muted, 100% = full volume</div>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Visual Theme:</label>
+                    <div style="display: flex; gap: 15px; margin-top: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="theme" value="dark" checked onchange="updateSettings()"> Dark
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="theme" value="light" onchange="updateSettings()"> Light
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Experience & Content Section -->
+            <div style="margin-top: 25px; padding: 15px; background: rgba(255,215,0,0.1); border-radius: 8px; border-left: 4px solid #ffd700;">
+                <h3 style="font-size: 1.3em; margin-bottom: 15px;">💕 Experience & Content</h3>
+
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Playable Characters:</label>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
+                            <input type="checkbox" value="🐄" class="charCheckbox" checked onchange="updateSettings()"> 🐄 Cow
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
+                            <input type="checkbox" value="🐰" class="charCheckbox" checked onchange="updateSettings()"> 🐰 Bunny
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
+                            <input type="checkbox" value="🐵" class="charCheckbox" checked onchange="updateSettings()"> 🐵 Monkey
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
+                            <input type="checkbox" value="👶" class="charCheckbox" checked onchange="updateSettings()"> 👶 Baby
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
+                            <input type="checkbox" value="🤖" class="charCheckbox" checked onchange="updateSettings()"> 🤖 Robot
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
+                            <input type="checkbox" value="🦄" class="charCheckbox" checked onchange="updateSettings()"> 🦄 Unicorn
+                        </label>
+                    </div>
+                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 8px;">Select which characters appear in the game</div>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Romantic Tips Style:</label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="tipsStyle" value="affectionate" checked onchange="updateSettings()"> 💕 Affectionate (romantic & loving)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="tipsStyle" value="playful" onchange="updateSettings()"> 😄 Playful (fun & silly)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="tipsStyle" value="thoughtful" onchange="updateSettings()"> 🤔 Thoughtful (deep & meaningful)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="tipsStyle" value="adventurous" onchange="updateSettings()"> 🎯 Adventurous (exciting activities)
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="radio" name="tipsStyle" value="mixed" onchange="updateSettings()"> 🎪 Mixed (all types)
+                        </label>
+                    </div>
+                </div>
+
+                <div style="margin: 15px 0;">
+                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Hint Frequency: <span id="hintFreqValue">Every 3 platforms</span></label>
+                    <input type="range" id="hintFreqSlider" min="2" max="8" step="1" value="3" style="width: 100%;" onchange="updateSettings()">
+                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 3px;">More frequent = more tips shown</div>
+                </div>
+            </div>
+
+            <!-- Presets & Actions -->
+            <div style="margin-top: 25px; text-align: center;">
+                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
+                    <button onclick="applyPreset('RESET')" style="background: #4CAF50; flex: 1; min-width: 120px;">↺ Reset to Default</button>
+                    <button onclick="applyPreset('DIFFICULT')" style="background: #ff4444; flex: 1; min-width: 120px;">⚡ Difficult Mode</button>
+                </div>
+                <div style="display: flex; gap: 10px; justify-content: center;">
+                    <button onclick="saveAndCloseSettings()" style="background: #ff1493; flex: 1; min-width: 100px;">✓ Save</button>
+                    <button onclick="closeSettings()" style="background: #666; flex: 1; min-width: 100px;">✕ Cancel</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -392,6 +538,218 @@
         let scoreMultiplier = 1;
         let multiplierPointsRemaining = 0;
         let activePowerUpEffects = {};
+
+        // ========== SETTINGS SYSTEM ==========
+        const DEFAULT_SETTINGS = {
+            gravity: 0.3,
+            jumpPower: 11,
+            platformGapMin: 50,
+            platformGapMax: 80,
+            gameSpeedMultiplier: 1.0,
+            powerUpSpawnRate: 0.19,
+            soundVolume: 100,
+            visualTheme: 'dark',
+            playableCharacters: ['🐄', '🐰', '🐵', '👶', '🤖', '🦄'],
+            romanticTipsStyle: 'affectionate',
+            hintFrequency: 3
+        };
+
+        const PRESETS = {
+            RESET: DEFAULT_SETTINGS,
+            DIFFICULT: {
+                gravity: 0.5,
+                jumpPower: 9,
+                platformGapMin: 65,
+                platformGapMax: 100,
+                gameSpeedMultiplier: 1.2,
+                powerUpSpawnRate: 0.10,
+                soundVolume: 100,
+                visualTheme: 'dark',
+                playableCharacters: ['🐄', '🐰', '🐵', '👶', '🤖', '🦄'],
+                romanticTipsStyle: 'affectionate',
+                hintFrequency: 5
+            }
+        };
+
+        let currentSettings = { ...DEFAULT_SETTINGS };
+
+        function validateSettings(settings) {
+            const validated = { ...settings };
+
+            // Gravity: 0.1 to 0.6
+            validated.gravity = Math.max(0.1, Math.min(0.6, parseFloat(settings.gravity) || 0.3));
+
+            // Jump Power: 8 to 14
+            validated.jumpPower = Math.max(8, Math.min(14, parseFloat(settings.jumpPower) || 11));
+
+            // Platform Gap: 30-70 (min), 70-120 (max)
+            validated.platformGapMin = Math.max(30, Math.min(70, parseInt(settings.platformGapMin) || 50));
+            validated.platformGapMax = Math.max(70, Math.min(120, parseInt(settings.platformGapMax) || 80));
+
+            // Game Speed: 0.7 to 1.5
+            validated.gameSpeedMultiplier = Math.max(0.7, Math.min(1.5, parseFloat(settings.gameSpeedMultiplier) || 1.0));
+
+            // Power-up spawn rate: 0.08 (8%) to 0.35 (35%)
+            validated.powerUpSpawnRate = Math.max(0.08, Math.min(0.35, parseFloat(settings.powerUpSpawnRate) || 0.19));
+
+            // Sound volume: 0 to 100
+            validated.soundVolume = Math.max(0, Math.min(100, parseInt(settings.soundVolume) || 100));
+
+            // Visual theme: dark or light
+            validated.visualTheme = (settings.visualTheme === 'light') ? 'light' : 'dark';
+
+            // Playable characters: array of valid emoji characters
+            if (Array.isArray(settings.playableCharacters) && settings.playableCharacters.length > 0) {
+                const validChars = ['🐄', '🐰', '🐵', '👶', '🤖', '🦄'];
+                validated.playableCharacters = settings.playableCharacters.filter(c => validChars.includes(c));
+                if (validated.playableCharacters.length === 0) {
+                    validated.playableCharacters = DEFAULT_SETTINGS.playableCharacters;
+                }
+            } else {
+                validated.playableCharacters = DEFAULT_SETTINGS.playableCharacters;
+            }
+
+            // Romantic tips style
+            const validStyles = ['affectionate', 'playful', 'thoughtful', 'adventurous', 'mixed'];
+            validated.romanticTipsStyle = validStyles.includes(settings.romanticTipsStyle) ? settings.romanticTipsStyle : 'affectionate';
+
+            // Hint frequency: 2 to 8
+            validated.hintFrequency = Math.max(2, Math.min(8, parseInt(settings.hintFrequency) || 3));
+
+            return validated;
+        }
+
+        function loadSettings() {
+            try {
+                const saved = localStorage.getItem('gameSettings');
+                if (saved) {
+                    const loaded = JSON.parse(saved);
+                    currentSettings = validateSettings(loaded);
+                    return true;
+                }
+            } catch (error) {
+                console.error('Error loading settings:', error);
+            }
+            currentSettings = { ...DEFAULT_SETTINGS };
+            return false;
+        }
+
+        function saveSettings() {
+            try {
+                currentSettings = validateSettings(currentSettings);
+                localStorage.setItem('gameSettings', JSON.stringify(currentSettings));
+                return true;
+            } catch (error) {
+                console.error('Error saving settings:', error);
+                return false;
+            }
+        }
+
+        function applySettingsToGame() {
+            // Apply gameplay settings
+            // Note: These constants are normally const, but we need to modify them for settings
+            // We'll use currentSettings directly in game logic instead of reassigning constants
+
+            // Apply visual theme
+            const isDark = currentSettings.visualTheme === 'dark';
+            document.body.style.background = isDark ? '#000' : '#fff';
+            document.getElementById('ui').style.background = isDark ? 'rgba(0,0,0,0.95)' : 'rgba(255,255,255,0.95)';
+            document.getElementById('ui').style.color = isDark ? 'white' : '#000';
+        }
+
+        function showSettings() {
+            // Load current settings into UI
+            document.getElementById('gravitySlider').value = currentSettings.gravity;
+            document.getElementById('gravityValue').textContent = currentSettings.gravity.toFixed(2);
+
+            document.getElementById('jumpPowerSlider').value = currentSettings.jumpPower;
+            document.getElementById('jumpPowerValue').textContent = currentSettings.jumpPower.toFixed(1);
+
+            document.getElementById('gapMinSlider').value = currentSettings.platformGapMin;
+            document.getElementById('gapMinValue').textContent = currentSettings.platformGapMin;
+            document.getElementById('gapMaxSlider').value = currentSettings.platformGapMax;
+            document.getElementById('gapMaxValue').textContent = currentSettings.platformGapMax;
+            document.getElementById('platformGapValue').textContent = currentSettings.platformGapMin + '-' + currentSettings.platformGapMax;
+
+            document.getElementById('speedMultSlider').value = currentSettings.gameSpeedMultiplier;
+            document.getElementById('speedMultValue').textContent = currentSettings.gameSpeedMultiplier.toFixed(1) + 'x';
+
+            document.getElementById('spawnRateSlider').value = (currentSettings.powerUpSpawnRate * 100).toFixed(0);
+            document.getElementById('spawnRateValue').textContent = (currentSettings.powerUpSpawnRate * 100).toFixed(0) + '%';
+
+            document.getElementById('soundVolSlider').value = currentSettings.soundVolume;
+            document.getElementById('soundVolValue').textContent = currentSettings.soundVolume + '%';
+
+            document.querySelector(`input[name="theme"][value="${currentSettings.visualTheme}"]`).checked = true;
+
+            // Set character checkboxes
+            document.querySelectorAll('.charCheckbox').forEach(cb => {
+                cb.checked = currentSettings.playableCharacters.includes(cb.value);
+            });
+
+            // Set tips style radio
+            document.querySelector(`input[name="tipsStyle"][value="${currentSettings.romanticTipsStyle}"]`).checked = true;
+
+            document.getElementById('hintFreqSlider').value = currentSettings.hintFrequency;
+            document.getElementById('hintFreqValue').textContent = 'Every ' + currentSettings.hintFrequency + ' platforms';
+
+            document.getElementById('ui').classList.add('show');
+            showScreen('settingsScreen');
+        }
+
+        function closeSettings() {
+            document.getElementById('ui').classList.add('show');
+            showScreen('leaderboardScreen');
+        }
+
+        function updateSettings() {
+            // Read values from UI controls
+            currentSettings.gravity = parseFloat(document.getElementById('gravitySlider').value);
+            document.getElementById('gravityValue').textContent = currentSettings.gravity.toFixed(2);
+
+            currentSettings.jumpPower = parseFloat(document.getElementById('jumpPowerSlider').value);
+            document.getElementById('jumpPowerValue').textContent = currentSettings.jumpPower.toFixed(1);
+
+            currentSettings.platformGapMin = parseInt(document.getElementById('gapMinSlider').value);
+            currentSettings.platformGapMax = parseInt(document.getElementById('gapMaxSlider').value);
+            document.getElementById('gapMinValue').textContent = currentSettings.platformGapMin;
+            document.getElementById('gapMaxValue').textContent = currentSettings.platformGapMax;
+            document.getElementById('platformGapValue').textContent = currentSettings.platformGapMin + '-' + currentSettings.platformGapMax;
+
+            currentSettings.gameSpeedMultiplier = parseFloat(document.getElementById('speedMultSlider').value);
+            document.getElementById('speedMultValue').textContent = currentSettings.gameSpeedMultiplier.toFixed(1) + 'x';
+
+            currentSettings.powerUpSpawnRate = parseInt(document.getElementById('spawnRateSlider').value) / 100;
+            document.getElementById('spawnRateValue').textContent = (currentSettings.powerUpSpawnRate * 100).toFixed(0) + '%';
+
+            currentSettings.soundVolume = parseInt(document.getElementById('soundVolSlider').value);
+            document.getElementById('soundVolValue').textContent = currentSettings.soundVolume + '%';
+
+            currentSettings.visualTheme = document.querySelector('input[name="theme"]:checked').value;
+
+            currentSettings.playableCharacters = Array.from(document.querySelectorAll('.charCheckbox:checked')).map(cb => cb.value);
+            if (currentSettings.playableCharacters.length === 0) {
+                currentSettings.playableCharacters = DEFAULT_SETTINGS.playableCharacters;
+            }
+
+            currentSettings.romanticTipsStyle = document.querySelector('input[name="tipsStyle"]:checked').value;
+
+            currentSettings.hintFrequency = parseInt(document.getElementById('hintFreqSlider').value);
+            document.getElementById('hintFreqValue').textContent = 'Every ' + currentSettings.hintFrequency + ' platforms';
+        }
+
+        function applyPreset(presetName) {
+            if (PRESETS[presetName]) {
+                currentSettings = { ...PRESETS[presetName] };
+                showSettings();
+            }
+        }
+
+        function saveAndCloseSettings() {
+            updateSettings();
+            saveSettings();
+            closeSettings();
+        }
 
         // ========== AUDIO - "Will Always Love You" Melody + Bounce Sound ==========
         let audioContext = null;
@@ -652,7 +1010,7 @@
         let lastTipShown = 0;  // Track last shown tip to avoid repeats
 
         // Character selection
-        const CHARACTERS = ['🐄', '🐰', '🐵', '👶', '🤖'];
+        const CHARACTERS = ['🐄', '🐰', '🐵', '👶', '🤖', '🦄'];
         let currentCharacter = '🐰';
 
         const player = {
@@ -664,12 +1022,16 @@
             init() {
                 this.x = W() / 2 - PLAYER_W / 2;
                 this.y = H() * 0.4;
-                this.vy = -JUMP_POWER;
+                const jumpPower = currentSettings.jumpPower * currentSettings.gameSpeedMultiplier;
+                this.vy = -jumpPower;
                 this.vx = 0;
             },
 
             update() {
-                this.vy += GRAVITY;
+                const gravity = currentSettings.gravity * currentSettings.gameSpeedMultiplier;
+                const jumpPower = currentSettings.jumpPower * currentSettings.gameSpeedMultiplier;
+
+                this.vy += gravity;
                 this.y += this.vy;
                 this.x += this.vx;
 
@@ -686,7 +1048,7 @@
 
                         // Handle shield (one free jump on fall)
                         if (!playerShielded) {
-                            this.vy = -JUMP_POWER;
+                            this.vy = -jumpPower;
                         } else {
                             playerShielded = false;
                             activePowerUpEffects.shield = null;
@@ -699,7 +1061,7 @@
 
                         // Handle rocket (increased jump height)
                         if (rocketActive && rocketJumpsRemaining > 0) {
-                            this.vy = -JUMP_POWER * 1.5; // 50% increased height
+                            this.vy = -jumpPower * 1.5; // 50% increased height
                             rocketJumpsRemaining--;
                             if (rocketJumpsRemaining === 0) {
                                 rocketActive = false;
@@ -707,8 +1069,8 @@
                             }
                         }
 
-                        // Show romantic tip every 3 platforms
-                        if (platformsJumped % 3 === 0) {
+                        // Show romantic tip based on hintFrequency setting
+                        if (platformsJumped % currentSettings.hintFrequency === 0) {
                             showRomanticTip();
                         }
                     }
@@ -753,9 +1115,11 @@
 
             // Spawn platforms upward (negative direction) - spawn MUCH further ahead at high scores
             const spawnTargetUp = cameraY - h * 25;
+            const gapMin = currentSettings.platformGapMin;
+            const gapMax = currentSettings.platformGapMax;
             while (nextPlatformY > spawnTargetUp) {
                 const x = Math.random() * Math.max(0, w - PLATFORM_W);
-                const gap = PLATFORM_GAP_MIN + Math.random() * (PLATFORM_GAP_MAX - PLATFORM_GAP_MIN);
+                const gap = gapMin + Math.random() * (gapMax - gapMin);
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
 
                 platforms.push({ x, y: nextPlatformY, item });
@@ -766,7 +1130,7 @@
             const spawnTargetDown = cameraY + h * 3;
             while (nextPlatformYDown < spawnTargetDown && nextPlatformYDown < H()) {
                 const x = Math.random() * Math.max(0, w - PLATFORM_W);
-                const gap = PLATFORM_GAP_MIN + Math.random() * (PLATFORM_GAP_MAX - PLATFORM_GAP_MIN);
+                const gap = gapMin + Math.random() * (gapMax - gapMin);
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
 
                 platforms.push({ x, y: nextPlatformYDown, item });
@@ -787,7 +1151,7 @@
             try {
                 // Only spawn power-ups on newly created platforms (those not yet processed)
                 platforms.forEach(p => {
-                    if (!p.hasPowerUp && Math.random() < POWER_UP_SPAWN_RATE) {
+                    if (!p.hasPowerUp && Math.random() < currentSettings.powerUpSpawnRate) {
                         p.hasPowerUp = true;
 
                         // Select random power-up type based on probability
@@ -1078,6 +1442,10 @@
         }
 
         function startGame() {
+            // Load and apply settings before game starts
+            loadSettings();
+            applySettingsToGame();
+
             gameState = 'playing';
             score = 0;
             level = 1;
@@ -1091,7 +1459,12 @@
             lastJumpY = H() * 0.4;  // Initial spawn position at 40% height
             platformsJumped = 0;  // Reset platform counter
             lastTipShown = 0;  // Reset tip tracker
-            currentCharacter = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];  // Random character
+
+            // Select random character from playable characters in settings
+            const availableChars = currentSettings.playableCharacters && currentSettings.playableCharacters.length > 0
+                ? currentSettings.playableCharacters
+                : CHARACTERS;
+            currentCharacter = availableChars[Math.floor(Math.random() * availableChars.length)];
 
             // Reset power-up effects
             powerUps = [];
