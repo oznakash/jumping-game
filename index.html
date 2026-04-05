@@ -311,6 +311,13 @@
                 <h3 style="font-size: 1.25em; margin: 0 0 20px 0; color: #4169e1;">🎵 Audio & Visual</h3>
 
                 <div style="margin-bottom: 18px;">
+                    <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; margin-bottom: 12px; font-weight: bold; font-size: 0.95em;">
+                        <input type="checkbox" id="soundEffectsToggle" checked onchange="updateSettings()">
+                        Enable Sound Effects 🔊
+                    </label>
+                </div>
+
+                <div style="margin-bottom: 18px;">
                     <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.95em;">Sound Effects Volume: <span id="soundVolValue" style="color: #4169e1;">100%</span></label>
                     <input type="range" id="soundVolSlider" min="0" max="100" step="10" value="100" style="width: 100%; cursor: pointer;" onchange="updateSettings()">
                     <div style="font-size: 0.8em; color: #6496ff; margin-top: 4px;">Muted ← | → Full Volume</div>
@@ -547,6 +554,7 @@
             gameSpeedMultiplier: 1.0,
             powerUpSpawnRate: 0.19,
             soundVolume: 100,
+            soundEffects: true,
             visualTheme: 'dark',
             playableCharacters: ['🐄', '🐰', '🐵', '👶', '🤖', '🦄'],
             romanticTipsStyle: 'affectionate',
@@ -564,6 +572,7 @@
                 gameSpeedMultiplier: 1.1,
                 powerUpSpawnRate: 0.12,
                 soundVolume: 100,
+                soundEffects: true,
                 visualTheme: 'dark',
                 playableCharacters: ['🐄', '🐰', '🐵', '👶', '🤖', '🦄'],
                 romanticTipsStyle: 'affectionate',
@@ -595,6 +604,9 @@
 
             // Sound volume: 0 to 100
             validated.soundVolume = Math.max(0, Math.min(100, parseInt(settings.soundVolume) || 100));
+
+            // Sound effects toggle
+            validated.soundEffects = (settings.soundEffects !== false);
 
             // Visual theme: dark or light
             validated.visualTheme = (settings.visualTheme === 'light') ? 'light' : 'dark';
@@ -687,6 +699,8 @@
             document.getElementById('soundVolSlider').value = currentSettings.soundVolume;
             document.getElementById('soundVolValue').textContent = currentSettings.soundVolume + '%';
 
+            document.getElementById('soundEffectsToggle').checked = currentSettings.soundEffects !== false;
+
             document.querySelector(`input[name="theme"][value="${currentSettings.visualTheme}"]`).checked = true;
 
             // Set character checkboxes
@@ -735,6 +749,8 @@
             currentSettings.soundVolume = parseInt(document.getElementById('soundVolSlider').value);
             document.getElementById('soundVolValue').textContent = currentSettings.soundVolume + '%';
             setMasterVolume(); // Apply volume change immediately
+
+            currentSettings.soundEffects = document.getElementById('soundEffectsToggle').checked;
 
             currentSettings.visualTheme = document.querySelector('input[name="theme"]:checked').value;
 
@@ -839,6 +855,9 @@
         }
 
         function playBounceSound() {
+            // Check if sound effects are enabled
+            if (!currentSettings.soundEffects) return;
+
             const audioCtx = initAudio();
             if (!audioCtx) {
                 console.warn('Audio context not available');
@@ -848,86 +867,21 @@
             try {
                 const now = audioCtx.currentTime;
 
-                // Character-specific bounce sounds
-                if (currentCharacter === '🐄') {
-                    // MOO sound for cow
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
+                // SIMPLE SINGLE BEEP - test if sound works at all
+                const osc = audioCtx.createOscillator();
+                const gain = audioCtx.createGain();
 
-                    osc.type = 'sine';
-                    // Cow moo: low frequency with vibrato
-                    osc.frequency.setValueAtTime(180, now);
-                    osc.frequency.linearRampToValueAtTime(220, now + 0.15);
-                    osc.frequency.linearRampToValueAtTime(180, now + 0.3);
+                osc.frequency.value = 600; // Single frequency
+                gain.gain.setValueAtTime(0.3, now); // Lower volume
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
 
-                    gain.gain.setValueAtTime(0.7, now);
-                    gain.gain.exponentialRampToValueAtTime(0, now + 0.35);
+                osc.connect(gain);
+                gain.connect(masterGain);
 
-                    osc.connect(gain);
-                    gain.connect(masterGain);
+                osc.start(now);
+                osc.stop(now + 0.1);
 
-                    osc.start(now);
-                    osc.stop(now + 0.35);
-                } else if (currentCharacter === '🐰') {
-                    // BOING sound for rabbit - quick and high
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(1200, now);
-                    osc.frequency.exponentialRampToValueAtTime(500, now + 0.08);
-
-                    gain.gain.setValueAtTime(0.6, now);
-                    gain.gain.exponentialRampToValueAtTime(0, now + 0.08);
-
-                    osc.connect(gain);
-                    gain.connect(masterGain);
-
-                    osc.start(now);
-                    osc.stop(now + 0.08);
-                } else if (currentCharacter === '🤖') {
-                    // BEEP sound for robot - two tones
-                    const osc1 = audioCtx.createOscillator();
-                    const osc2 = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-
-                    osc1.type = 'square';
-                    osc2.type = 'square';
-
-                    osc1.frequency.setValueAtTime(800, now);
-                    osc2.frequency.setValueAtTime(600, now);
-
-                    gain.gain.setValueAtTime(0.3, now);
-                    gain.gain.exponentialRampToValueAtTime(0, now + 0.1);
-
-                    osc1.connect(gain);
-                    osc2.connect(gain);
-                    gain.connect(masterGain);
-
-                    osc1.start(now);
-                    osc2.start(now);
-                    osc1.stop(now + 0.1);
-                    osc2.stop(now + 0.1);
-                } else {
-                    // Default bounce sound for other characters
-                    const osc = audioCtx.createOscillator();
-                    const gain = audioCtx.createGain();
-
-                    osc.type = 'sine';
-                    osc.frequency.setValueAtTime(800, now);
-                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
-
-                    gain.gain.setValueAtTime(0.8, now);
-                    gain.gain.exponentialRampToValueAtTime(0, now + 0.1);
-
-                    osc.connect(gain);
-                    gain.connect(masterGain);
-
-                    osc.start(now);
-                    osc.stop(now + 0.1);
-                }
-
-                console.log('Bounce sound played for:', currentCharacter);
+                console.log('Simple bounce sound played');
             } catch (e) {
                 console.error('Bounce sound error:', e);
             }
@@ -1492,6 +1446,9 @@
         }
 
         function playPowerUpSound(type) {
+            // Check if sound effects are enabled
+            if (!currentSettings.soundEffects) return;
+
             try {
                 const audioCtx = initAudio();
                 if (!audioCtx) return;
