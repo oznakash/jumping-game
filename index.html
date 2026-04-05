@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.37</div>
+    <div id="version">v1.0.38</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -694,8 +694,8 @@
 
             if (!w || !h || w === 0 || h === 0) return;
 
-            // Spawn platforms upward (negative direction)
-            const spawnTargetUp = cameraY - h * 15;
+            // Spawn platforms upward (negative direction) - spawn MUCH further ahead at high scores
+            const spawnTargetUp = cameraY - h * 25;
             while (nextPlatformY > spawnTargetUp) {
                 const x = Math.random() * Math.max(0, w - PLATFORM_W);
                 const gap = PLATFORM_GAP_MIN + Math.random() * (PLATFORM_GAP_MAX - PLATFORM_GAP_MIN);
@@ -716,8 +716,8 @@
                 nextPlatformYDown += gap;  // Add to move downward (increasing Y)
             }
 
-            // Keep platforms that are visible or upcoming (10 screen heights above and 3 below camera)
-            platforms = platforms.filter(p => p.y > cameraY - h * 10 && p.y < cameraY + h * 3);
+            // Keep platforms that are visible or upcoming (15 screen heights above and 3 below camera)
+            platforms = platforms.filter(p => p.y > cameraY - h * 15 && p.y < cameraY + h * 3);
         }
 
         function updateCamera() {
@@ -851,6 +851,9 @@
             // Stop any existing music and start fresh
             stopGameMusic();
             playGameMusic();
+
+            // Test bounce sound to verify audio is working
+            setTimeout(() => playBounceSound(), 100);
         }
 
         function endGame() {
