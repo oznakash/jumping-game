@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.18</div>
+    <div id="version">v1.0.19</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -450,47 +450,66 @@
             if (!ctx) return;
 
             const melody = [
-                // ===== ORIGINAL CATCHY SINGALONG CHORUS (98 BPM, C Major) =====
-                // 8-bar loop with call → response → chant → resolution structure
+                // ===== ORIGINAL MARIO-STYLE BOUNCY THEME (98 BPM, C Major) =====
+                // Uplifting, cheerful, with rapid ascending phrases and bouncy rhythm
 
-                // BARS 1-2: CALL (warm, inviting, rising)
-                // Short rising phrase: C E G / G A G
-                { freq: 261.63, duration: 0.6 },   // C4 quarter
+                // BAR 1: Opening bounce (rapid staccato ascending)
+                { freq: 261.63, duration: 0.3 },   // C4 eighth
+                { freq: 261.63, duration: 0.3 },   // C4 eighth
+                { freq: 329.63, duration: 0.3 },   // E4 eighth
+                { freq: 392.00, duration: 0.3 },   // G4 eighth
+                { freq: 392.00, duration: 0.3 },   // G4 eighth
+                { freq: 392.00, duration: 0.3 },   // G4 eighth (bounce on G)
+
+                // BAR 2: First descent with rhythm
+                { freq: 329.63, duration: 0.3 },   // E4 eighth
+                { freq: 329.63, duration: 0.3 },   // E4 eighth
+                { freq: 261.63, duration: 0.3 },   // C4 eighth
+                { freq: 293.66, duration: 0.3 },   // D4 eighth
+                { freq: 329.63, duration: 0.3 },   // E4 eighth
+                { freq: 0, duration: 0.3 },        // Rest (eighth)
+
+                // BAR 3: Ascending again with energy
+                { freq: 392.00, duration: 0.3 },   // G4 eighth
+                { freq: 392.00, duration: 0.3 },   // G4 eighth
+                { freq: 440.00, duration: 0.3 },   // A4 eighth
+                { freq: 392.00, duration: 0.3 },   // G4 eighth
+                { freq: 349.23, duration: 0.3 },   // F4 eighth
+                { freq: 329.63, duration: 0.3 },   // E4 eighth (descending from peak)
+
+                // BAR 4: Building momentum
+                { freq: 261.63, duration: 0.3 },   // C4 eighth
+                { freq: 293.66, duration: 0.3 },   // D4 eighth
+                { freq: 329.63, duration: 0.3 },   // E4 eighth
+                { freq: 349.23, duration: 0.3 },   // F4 eighth
+                { freq: 392.00, duration: 0.3 },   // G4 eighth
+                { freq: 0, duration: 0.3 },        // Rest (eighth)
+
+                // BAR 5: Climactic high bounce
+                { freq: 523.25, duration: 0.3 },   // C5 eighth (octave leap!)
+                { freq: 523.25, duration: 0.3 },   // C5 eighth
+                { freq: 392.00, duration: 0.3 },   // G4 eighth (jump down)
+                { freq: 392.00, duration: 0.3 },   // G4 eighth
+                { freq: 329.63, duration: 0.3 },   // E4 eighth
+                { freq: 261.63, duration: 0.3 },   // C4 eighth
+
+                // BAR 6: Rapid bouncing rhythm
+                { freq: 392.00, duration: 0.3 },   // G4 eighth
+                { freq: 392.00, duration: 0.3 },   // G4 eighth
+                { freq: 329.63, duration: 0.3 },   // E4 eighth
+                { freq: 329.63, duration: 0.3 },   // E4 eighth
+                { freq: 261.63, duration: 0.3 },   // C4 eighth
+                { freq: 261.63, duration: 0.3 },   // C4 eighth
+
+                // BAR 7: Descending resolution
+                { freq: 392.00, duration: 0.6 },   // G4 quarter
+                { freq: 392.00, duration: 0.6 },   // G4 quarter
                 { freq: 329.63, duration: 0.6 },   // E4 quarter
-                { freq: 392.00, duration: 1.2 },   // G4 half
-                { freq: 392.00, duration: 0.6 },   // G4 quarter
-                { freq: 440.00, duration: 0.6 },   // A4 quarter
-                { freq: 392.00, duration: 1.2 },   // G4 half
+                { freq: 261.63, duration: 0.6 },   // C4 quarter
 
-                // BARS 3-4: CALL VARIATION (higher, more energetic)
-                // Higher version: G A C5 / C5 B A
-                { freq: 392.00, duration: 0.6 },   // G4 quarter
-                { freq: 440.00, duration: 0.6 },   // A4 quarter
-                { freq: 523.25, duration: 1.2 },   // C5 half (high!)
-                { freq: 523.25, duration: 0.6 },   // C5 quarter
-                { freq: 493.88, duration: 0.6 },   // B4 quarter
-                { freq: 440.00, duration: 1.2 },   // A4 half
-
-                // BARS 5-6: CHANT (repetitive, punchy "DA DA DA — DA DA" rhythm)
-                // C C C (rest) C C / G G G (rest) G G
-                { freq: 261.63, duration: 0.3 },   // C4 eighth
-                { freq: 261.63, duration: 0.3 },   // C4 eighth
-                { freq: 261.63, duration: 0.3 },   // C4 eighth
-                { freq: 0, duration: 0.3 },        // Rest (eighth)
-                { freq: 261.63, duration: 0.3 },   // C4 eighth
-                { freq: 261.63, duration: 0.3 },   // C4 eighth
-                { freq: 392.00, duration: 0.3 },   // G4 eighth (shift to G for energy)
-                { freq: 392.00, duration: 0.3 },   // G4 eighth
-                { freq: 392.00, duration: 0.3 },   // G4 eighth
-                { freq: 0, duration: 0.3 },        // Rest (eighth)
-                { freq: 392.00, duration: 0.3 },   // G4 eighth
-                { freq: 392.00, duration: 0.3 },   // G4 eighth
-
-                // BARS 7-8: RESOLUTION (longer notes, gentle landing)
-                // G E / C (long, peaceful)
-                { freq: 392.00, duration: 1.2 },   // G4 half
-                { freq: 329.63, duration: 1.2 },   // E4 half
-                { freq: 261.63, duration: 2.4 },   // C4 whole (home, resolution)
+                // BAR 8: Final flourish (strong landing)
+                { freq: 392.00, duration: 1.2 },   // G4 half (solid note)
+                { freq: 261.63, duration: 1.2 },   // C4 half (home, resolved)
             ];
 
             function playMelody() {
