@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.26</div>
+    <div id="version">v1.0.27</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -668,6 +668,14 @@
                 ctx.fillStyle = '#000';
                 ctx.fillRect(this.x + 7, sy + 7, 2, 2);
                 ctx.fillRect(this.x + 15, sy + 7, 2, 2);
+
+                // Draw emoji on rectangle
+                ctx.save();
+                ctx.font = '24px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(currentCharacter, this.x + PLAYER_W / 2, sy + PLAYER_H / 2);
+                ctx.restore();
             }
         };
 
