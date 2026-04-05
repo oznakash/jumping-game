@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.31</div>
+    <div id="version">v1.0.32</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -668,10 +668,9 @@
 
             if (!w || !h || w === 0 || h === 0) return;
 
-            // Spawn platforms upward until we're 15 screen heights above camera
-            const spawnTarget = cameraY - h * 15;
-
-            while (nextPlatformY > spawnTarget) {
+            // Spawn platforms upward (negative direction)
+            const spawnTargetUp = cameraY - h * 15;
+            while (nextPlatformY > spawnTargetUp) {
                 const x = Math.random() * Math.max(0, w - PLATFORM_W);
                 const gap = PLATFORM_GAP_MIN + Math.random() * (PLATFORM_GAP_MAX - PLATFORM_GAP_MIN);
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
@@ -680,8 +679,20 @@
                 nextPlatformY -= gap;  // Subtract to move upward (decreasing Y)
             }
 
-            // Keep platforms that are visible or upcoming (10 screen heights above and 2 below camera)
-            platforms = platforms.filter(p => p.y > cameraY - h * 10 && p.y < cameraY + h * 2);
+            // Spawn platforms downward (positive direction) if needed
+            let platformYDown = H() * 0.4 + 80;  // Start below player
+            const spawnTargetDown = cameraY + h * 5;
+            while (platformYDown < spawnTargetDown) {
+                const x = Math.random() * Math.max(0, w - PLATFORM_W);
+                const gap = PLATFORM_GAP_MIN + Math.random() * (PLATFORM_GAP_MAX - PLATFORM_GAP_MIN);
+                const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
+
+                platforms.push({ x, y: platformYDown, item });
+                platformYDown += gap;  // Add to move downward (increasing Y)
+            }
+
+            // Keep platforms that are visible or upcoming (10 screen heights above and 5 below camera)
+            platforms = platforms.filter(p => p.y > cameraY - h * 10 && p.y < cameraY + h * 5);
         }
 
         function updateCamera() {
