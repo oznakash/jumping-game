@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.25</div>
+    <div id="version">v1.0.26</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -599,6 +599,10 @@
         let platformsJumped = 0;  // Counter for platforms jumped on
         let lastTipShown = 0;  // Track last shown tip to avoid repeats
 
+        // Character selection
+        const CHARACTERS = ['🐄', '🐰', '🐵', '👶', '🤖'];
+        let currentCharacter = '🐰';
+
         const player = {
             x: 0,
             y: 0,
@@ -646,7 +650,16 @@
 
             draw() {
                 const sy = this.y - cameraY;
-                ctx.fillStyle = '#ff1493';
+
+                // Color based on character
+                let color = '#ff1493';  // default pink
+                if (currentCharacter === '🐄') color = '#8B6F47';      // Cow - brown
+                else if (currentCharacter === '🐰') color = '#FFB6C1';  // Bunny - light pink
+                else if (currentCharacter === '🐵') color = '#8B4513';  // Monkey - saddle brown
+                else if (currentCharacter === '👶') color = '#FDBCB4';  // Baby - peach
+                else if (currentCharacter === '🤖') color = '#A9A9A9';  // Robot - gray
+
+                ctx.fillStyle = color;
                 ctx.fillRect(this.x, sy, PLAYER_W, PLAYER_H);
 
                 ctx.fillStyle = '#fff';
@@ -790,6 +803,7 @@
             lastJumpY = H() - 150;  // Initial spawn position
             platformsJumped = 0;  // Reset platform counter
             lastTipShown = 0;  // Reset tip tracker
+            currentCharacter = CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)];  // Random character
 
             player.init();
             spawnPlatforms();
