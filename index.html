@@ -125,8 +125,9 @@
             margin: 20px 0;
         }
         .leaderboard-entry {
-            display: flex;
-            justify-content: space-between;
+            display: grid;
+            grid-template-columns: 40px 1fr 50px;
+            gap: 10px;
             align-items: center;
             padding: 10px;
             margin: 6px 0;
@@ -138,8 +139,17 @@
             background: rgba(255,215,0,0.2);
             border-left-color: #ffd700;
         }
-        .rank { font-weight: bold; min-width: 35px; }
-        .name { flex: 1; margin: 0 10px; text-align: left; }
+        .leaderboard-entry .activity-note {
+            grid-column: 1 / -1;
+            font-size: 0.9em;
+            color: #ff69b4;
+            font-style: italic;
+            margin-top: 5px;
+            padding-top: 5px;
+            border-top: 1px solid rgba(255,105,180,0.3);
+        }
+        .rank { font-weight: bold; }
+        .name { text-align: left; }
         .score-value { font-weight: bold; }
         #levelUp {
             display: none;
@@ -181,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.12</div>
+    <div id="version">v1.0.13</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -672,11 +682,12 @@
 
         function addScore(name, sc) {
             const board = loadLeaderboard();
-            board.push({ name, score: sc });
+            const activity = getAnniversaryActivity(sc);
+            board.push({ name, score: sc, activity });
             board.sort((a, b) => b.score - a.score);
             board.splice(5);
             saveLeaderboard(board);
-            lastLeader = { name, score: sc };
+            lastLeader = { name, score: sc, activity };
         }
 
         function displayLeaderboard() {
@@ -692,7 +703,8 @@
             board.forEach((e, i) => {
                 const div = document.createElement('div');
                 div.className = 'leaderboard-entry' + (lastLeader && lastLeader.name === e.name ? ' latest' : '');
-                div.innerHTML = `<span class="rank">#${i+1}</span><span class="name">${e.name}</span><span class="score-value">${e.score}</span>`;
+                const activity = e.activity || getAnniversaryActivity(e.score);
+                div.innerHTML = `<span class="rank">#${i+1}</span><span class="name">${e.name}</span><span class="score-value">${e.score}</span><div class="activity-note">${activity}</div>`;
                 el.appendChild(div);
             });
             lastLeader = null;
