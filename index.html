@@ -734,6 +734,7 @@
 
             currentSettings.soundVolume = parseInt(document.getElementById('soundVolSlider').value);
             document.getElementById('soundVolValue').textContent = currentSettings.soundVolume + '%';
+            setMasterVolume(); // Apply volume change immediately
 
             currentSettings.visualTheme = document.querySelector('input[name="theme"]:checked').value;
 
@@ -769,6 +770,7 @@
 
         // ========== AUDIO - "Will Always Love You" Melody + Bounce Sound ==========
         let audioContext = null;
+        let masterGain = null;
         let isPlayingMusic = false;
         let musicLoopTimeout = null;
 
@@ -776,6 +778,9 @@
             if (!audioContext) {
                 try {
                     audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                    // Create master gain node for volume control
+                    masterGain = audioContext.createGain();
+                    masterGain.connect(audioContext.destination);
                     // Resume on first user interaction
                     if (audioContext.state === 'suspended') {
                         document.addEventListener('click', () => audioContext.resume(), { once: true });
@@ -786,6 +791,15 @@
                 }
             }
             return audioContext;
+        }
+
+        function setMasterVolume() {
+            if (!audioContext) return;
+            const volumePercent = currentSettings.soundVolume || 100;
+            const volumeGain = volumePercent / 100; // Convert 0-100 to 0-1
+            if (masterGain) {
+                masterGain.gain.setValueAtTime(volumeGain, audioContext.currentTime);
+            }
         }
 
         function playNote(freq, startTime, duration) {
@@ -803,7 +817,7 @@
                 gain.gain.exponentialRampToValueAtTime(0.01, startTime + duration);
 
                 osc.connect(gain);
-                gain.connect(audioCtx.destination);
+                gain.connect(masterGain);
 
                 osc.start(startTime);
                 osc.stop(startTime + duration);
@@ -832,7 +846,7 @@
                 gain.gain.exponentialRampToValueAtTime(0, now + 0.1);
 
                 osc.connect(gain);
-                gain.connect(audioCtx.destination);
+                gain.connect(masterGain);
 
                 osc.start(now);
                 osc.stop(now + 0.1);
@@ -1424,7 +1438,7 @@
                     gain.gain.exponentialRampToValueAtTime(0, now + duration);
 
                     osc.connect(gain);
-                    gain.connect(audioCtx.destination);
+                    gain.connect(masterGain);
                     osc.start(now);
                     osc.stop(now + duration);
                 }, 50);
@@ -1658,6 +1672,7 @@
             // Load and apply settings before game starts
             loadSettings();
             applySettingsToGame();
+            setMasterVolume(); // Set audio volume from settings
 
             // Reset stopwatch for new game
             resetStopwatch();
