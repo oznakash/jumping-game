@@ -847,22 +847,91 @@
 
             try {
                 const now = audioCtx.currentTime;
-                const osc = audioCtx.createOscillator();
-                const gain = audioCtx.createGain();
 
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(800, now);
-                osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+                // Character-specific bounce sounds
+                if (currentCharacter === '🐄') {
+                    // MOO sound for cow
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
 
-                gain.gain.setValueAtTime(0.8, now);
-                gain.gain.exponentialRampToValueAtTime(0, now + 0.1);
+                    osc.type = 'sine';
+                    // Cow moo: low frequency with vibrato
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(220, now + 0.15);
+                    osc.frequency.linearRampToValueAtTime(180, now + 0.3);
 
-                osc.connect(gain);
-                gain.connect(masterGain);
+                    gain.gain.setValueAtTime(0.7, now);
+                    gain.gain.exponentialRampToValueAtTime(0, now + 0.35);
 
-                osc.start(now);
-                osc.stop(now + 0.1);
-                console.log('Bounce sound played');
+                    osc.connect(gain);
+                    gain.connect(masterGain);
+
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } else if (currentCharacter === '🐰') {
+                    // BOING sound for rabbit - quick and high
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(1200, now);
+                    osc.frequency.exponentialRampToValueAtTime(500, now + 0.08);
+
+                    gain.gain.setValueAtTime(0.6, now);
+                    gain.gain.exponentialRampToValueAtTime(0, now + 0.08);
+
+                    osc.connect(gain);
+                    gain.connect(masterGain);
+
+                    osc.start(now);
+                    osc.stop(now + 0.08);
+                } else if (currentCharacter === '🤖') {
+                    // BEEP sound for robot - two tones
+                    const osc1 = audioCtx.createOscillator();
+                    const osc2 = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc1.type = 'square';
+                    osc2.type = 'square';
+
+                    osc1.frequency.setValueAtTime(800, now);
+                    osc2.frequency.setValueAtTime(600, now);
+
+                    gain.gain.setValueAtTime(0.3, now);
+                    gain.gain.exponentialRampToValueAtTime(0, now + 0.1);
+
+                    osc1.connect(gain);
+                    osc2.connect(gain);
+                    gain.connect(masterGain);
+
+                    osc1.start(now);
+                    osc2.start(now);
+                    osc1.stop(now + 0.1);
+                    osc2.stop(now + 0.1);
+                } else {
+                    // Default bounce sound for other characters
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(800, now);
+                    osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+
+                    gain.gain.setValueAtTime(0.8, now);
+                    gain.gain.exponentialRampToValueAtTime(0, now + 0.1);
+
+                    osc.connect(gain);
+                    gain.connect(masterGain);
+
+                    osc.start(now);
+                    osc.stop(now + 0.1);
+                }
+
+                console.log('Bounce sound played for:', currentCharacter);
+            } catch (e) {
+                console.error('Bounce sound error:', e);
+            }
+        }
             } catch (e) {
                 console.error('Bounce sound error:', e);
             }
