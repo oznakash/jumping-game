@@ -475,50 +475,39 @@
         ];
 
         const ANNIVERSARY_ACTIVITIES = [
-            // Group 0: FREE (0-25 points)
-            ["Walk in the park with Bamba 🐕", "Picnic at the beach watching sunset 🌅", "Stargazing from your backyard 🌟", "Cook a special dinner together 👨‍🍳"],
-            // Group 1: <$20 (25-50 points)
-            ["Movie night with homemade popcorn 🍿", "Breakfast at your favorite local cafe ☕", "Hike to a scenic viewpoint 🥾", "Game night with your favorite snacks 🎮"],
-            // Group 2: $20-50 (50-75 points)
-            ["Couples massage class online 💆", "Nice dinner at a local restaurant 🍽️", "Concert or live music show 🎵", "Painting class for two 🎨"],
-            // Group 3: Restaurant - Italian Cuisine (150-199 points)
-            ["Romantic Italian dinner 🍝", "Cozy trattoria with wine 🍷", "Pasta cooking class & dinner 👨‍🍳", "Italian rooftop restaurant 🌆"],
-            // Group 4: Restaurant - Asian Cuisine (200-249 points)
-            ["Upscale Japanese sushi dinner 🍣", "Thai fine dining experience 🌶️", "Korean BBQ & wine pairing 🥩", "Vietnamese pho tasting menu 🍜"],
-            // Group 5: Restaurant - French & International (250-299 points)
-            ["French Michelin-star experience ⭐", "Spanish tapas & wine night 🍷", "Portuguese seafood feast 🦐", "Mediterranean gourmet dinner 🌿"],
-            // Group 6: $400-600 (200-250 points)
-            ["Adventure to Niagara Falls ⛲", "Las Vegas romantic weekend 🎰", "New Orleans jazz and culture trip 🎷", "Florida Keys exploration 🌴"],
-            // Group 7: $600-900 (250-300 points)
-            ["Costa Rica adventure & eco-lodge 🌿", "Hawaii beach resort getaway 🏖️", "Maldives tropical paradise 🐠", "Iceland glacier exploration ❄️"],
-            // Group 8: $900-1200 (300-350 points)
-            ["European city tour (Paris, Rome) 🗼", "Japan cultural experience 🗾", "Swiss Alps luxury retreat ⛰️", "Greek islands sailing vacation ⛵"],
-            // Group 9: $1200-1600 (350-400 points)
-            ["African safari experience 🦁", "New Zealand adventure trip 🥝", "Thailand exotic escape 🐘", "Egypt ancient wonders tour 🏛️"],
-            // Group 10: $1600-2000 (400-450 points)
-            ["Caribbean luxury cruise 🚢", "Bora Bora overwater bungalow 🏠", "Seychelles island paradise 🏝️", "Bali temple and beach retreat 🕌"],
-            // Group 11: $2000-2500 (450-500 points)
-            ["Iceland & Greenland expedition 🧊", "Australia outback adventure 🦘", "Indonesia Komodo dragons tour 🦎", "Morocco desert luxury safari 🐪"],
-            // Group 12: $2500-3200 (500-550 points)
-            ["South Africa wine & safari combo 🍷", "Patagonia hiking expedition 🏔️", "Peru Machu Picchu trek 🗻", "Jordan Petra exploration 🏜️"],
-            // Group 13: $3200-4000 (550-600 points)
-            ["Luxury Antarctica expedition 🐧", "Norway Northern Lights cruise 🌌", "Canada Rocky Mountains resort 🏔️", "Private island vacation 🏝️"],
-            // Group 14: $4000-5000 (600-650 points)
-            ["Bali private villa with chef 👨‍🍳", "Maldives underwater bungalow 🌊", "Dubai luxury shopping & spa 💎", "Monaco & French Riviera 🌊"],
-            // Group 15: $5000-6500 (650-700 points)
-            ["Fiji private island resort 🏝️", "Thailand private yacht charter ⛵", "Indonesia private island escape 🏖️", "Turks & Caicos luxury resort 🏖️"],
-            // Group 16: $6500-8000 (700-750 points)
-            ["St. Barts ultra-luxury resort 🏝️", "Barbados private beach villa 🌴", "Cayman Islands exclusive resort 🏖️", "US Virgin Islands paradise 🏝️"],
-            // Group 17: $8000-10000 (750-800 points)
-            ["Caribbean private yacht week ⛵", "Exclusive Maldives resort 🏝️", "Bali luxury resort with infinity pool ♾️", "Thailand private luxury villa 🏡"],
-            // Group 18: $10000-13000 (800-850 points)
-            ["Iceland luxury lodge & helicopter 🚁", "Switzerland private chalet rental 🏔️", "Greece private villa & yacht 🛥️", "Portugal Douro Valley vineyard retreat 🍷"],
-            // Group 19: $13000-16000 (850-900 points)
-            ["Japan luxury ryokan experience 🏨", "Morocco Marrakech palace hotel 🏰", "Egypt Nile luxury cruise 🚢", "Vietnam luxury resort chain 🏝️"],
-            // Group 20: $16000-20000 (900-950 points)
-            ["Hong Kong luxury hotel week 🏨", "Singapore Gardens by the Bay suite 🌺", "Bangkok luxury wellness retreat 💆", "Bali ultra-luxury spa resort 💆"],
-            // Group 21: $20000-25000 (950-1000 points)
-            ["Maldives 7-night resort vacation 🏝️", "Fiji luxury island resort 🏖️", "Bora Bora honeymoon bungalow 🏠", "Seychelles private island escape 🏝️"],
+            // Group 0: FREE to $20 (0-100 points)
+            ["Walk in the park with Bamba 🐕", "Picnic at the beach watching sunset 🌅", "Stargazing from your backyard 🌟", "Cook a special dinner together 👨‍🍳", "Movie night with homemade popcorn 🍿", "Breakfast at your favorite local cafe ☕", "Hike to a scenic viewpoint 🥾", "Game night with your favorite snacks 🎮"],
+
+            // Group 1: $20-100 (100-200 points) - Local experiences & casual dining
+            ["Couples massage class online 💆", "Nice dinner at a local restaurant 🍽️", "Concert or live music show 🎵", "Painting class for two 🎨", "Couples yoga retreat day 🧘", "Wine tasting at local vineyard 🍷", "Cooking class together 👨‍🍳", "Outdoor adventure day trip 🏕️"],
+
+            // Group 2: $100-200 (200-300 points) - Restaurant experiences & short trips
+            ["Romantic Italian dinner 🍝", "Upscale Japanese sushi dinner 🍣", "Thai fine dining experience 🌶️", "Spanish tapas & wine night 🍷", "Korean BBQ & wine pairing 🥩", "French fine dining experience ⭐", "Weekend getaway to nearby destination 🏨", "Couples spa day with treatments 💆"],
+
+            // Group 3: $200-400 (300-400 points) - Domestic trips & adventures
+            ["Adventure to Niagara Falls ⛲", "Las Vegas romantic weekend 🎰", "New Orleans jazz and culture trip 🎷", "Florida Keys exploration 🌴", "San Francisco city break 🌉", "Big Sur coastal drive experience 🚗", "Rocky Mountain hiking adventure 🏔️", "Bourbon Street experience 🥃"],
+
+            // Group 4: $400-600 (400-500 points) - Beach & warm destination trips
+            ["Costa Rica adventure & eco-lodge 🌿", "Hawaii beach resort getaway 🏖️", "Cancun all-inclusive resort 🏖️", "Puerto Rico romantic escape 🏝️", "Virgin Islands sailing adventure ⛵", "Bahamas island hopping 🏝️", "Turks & Caicos paradise 🏖️", "Cozumel diving expedition 🤿"],
+
+            // Group 5: $600-800 (500-600 points) - International luxury trips
+            ["Iceland glacier exploration ❄️", "European city tour (Paris, Rome) 🗼", "Japan cultural experience 🗾", "Greek islands sailing vacation ⛵", "African safari experience 🦁", "New Zealand adventure trip 🥝", "Thailand exotic escape 🐘", "Egypt ancient wonders tour 🏛️"],
+
+            // Group 6: $800-1200 (600-700 points) - Premium worldwide destinations
+            ["Caribbean luxury cruise 🚢", "Bora Bora overwater bungalow 🏠", "Maldives tropical paradise 🐠", "Bali temple and beach retreat 🕌", "Iceland & Greenland expedition 🧊", "Australia outback adventure 🦘", "Indonesia Komodo dragons tour 🦎", "Morocco desert luxury safari 🐪"],
+
+            // Group 7: $1200-2000 (700-800 points) - Ultra-premium international
+            ["Swiss Alps luxury retreat ⛰️", "Norwegian Northern Lights cruise 🌌", "South Africa wine & safari combo 🍷", "Patagonia hiking expedition 🏔️", "Peru Machu Picchu trek 🗻", "Jordan Petra exploration 🏜️", "Canada Rocky Mountains resort 🏔️", "Private island vacation 🏝️"],
+
+            // Group 8: $2000-5000 (800-900 points) - Extreme luxury & exclusive
+            ["Luxury Antarctica expedition 🐧", "Bali private villa with chef 👨‍🍳", "Maldives underwater bungalow 🌊", "Dubai luxury shopping & spa 💎", "Fiji private island resort 🏝️", "Thailand private yacht charter ⛵", "Indonesia private island escape 🏖️", "St. Barts ultra-luxury resort 🏝️"],
+
+            // Group 9: $5000+ (900+ points) - Ultra-premium exclusive experiences
+            ["Private jet to Caribbean 🛩️", "Two-week Mediterranean cruise 🚢", "African safari with private guide 🦁", "South Pacific island hopping 🏝️", "Hong Kong luxury hotel week 🏨", "Singapore Gardens by the Bay suite 🌺", "Bangkok luxury wellness retreat 💆", "Japan luxury ryokan experience 🏨"],
+
+            // Group 10: Ultimate luxury (950+ points) - Dream experiences
+            ["Private yacht week in Mediterranean ⛵", "Maldives 7-night overwater resort 🏝️", "Seychelles private island escape 🏝️", "Bora Bora honeymoon premium 🏠", "Morocco Marrakech palace hotel 🏰", "Egypt Nile luxury cruise 🚢", "Vietnam luxury resort chain 🏝️", "Bali ultra-luxury spa resort 💆"],
+        ];
             // Group 22: $25000-35000 (1000-1100 points)
             ["Private jet to Caribbean 🛩️", "Two-week Mediterranean cruise 🚢", "African safari with private guide 🦁", "South Pacific island hopping 🏝️"],
             // Group 23: $35000-50000 (1100-1200 points)
@@ -970,14 +959,32 @@
         }
 
         function getAnniversaryActivity(score) {
-            // Determine which group based on score
-            // Score ranges: 0-25 (group 0), 26-35 (group 1), 36-45 (group 2), etc.
-            // Maximum groups: 25 (0-24)
+            // Determine group based on score thresholds (improved variety)
             let groupIndex = 0;
-            if (score >= 26) {
-                groupIndex = Math.floor((score - 26) / 10) + 1;
+
+            if (score < 100) {
+                groupIndex = 0; // Free to $20
+            } else if (score < 200) {
+                groupIndex = 1; // $20-100
+            } else if (score < 300) {
+                groupIndex = 2; // $100-200
+            } else if (score < 400) {
+                groupIndex = 3; // $200-400
+            } else if (score < 500) {
+                groupIndex = 4; // $400-600
+            } else if (score < 600) {
+                groupIndex = 5; // $600-800
+            } else if (score < 700) {
+                groupIndex = 6; // $800-1200
+            } else if (score < 800) {
+                groupIndex = 7; // $1200-2000
+            } else if (score < 900) {
+                groupIndex = 8; // $2000-5000
+            } else if (score < 950) {
+                groupIndex = 9; // $5000+ (900-950)
+            } else {
+                groupIndex = 10; // Ultimate luxury (950+)
             }
-            groupIndex = Math.min(groupIndex, 24); // Cap at max group
 
             // Get random activity from the group
             const group = ANNIVERSARY_ACTIVITIES[groupIndex];
