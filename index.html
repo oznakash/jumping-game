@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.16</div>
+    <div id="version">v1.0.17</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -365,10 +365,10 @@
         ];
 
         const PLATFORM_ITEMS = [
-            'walk', 'dinner', 'wine', 'picnic', 'spa', 'concert', 'beach',
-            'hike', 'dance', 'yacht', 'flight', 'resort', 'safari', 'cruise',
-            'lodge', 'island', 'tour', 'trek', 'jazz', 'bbq', 'sushi',
-            'pasta', 'tapas', 'date', 'brunch', 'cafe', 'game', 'paint'
+            '🚶 walk', '🍽️ dinner', '🍷 wine', '🧺 picnic', '💆 spa', '🎵 concert', '🏖️ beach',
+            '🥾 hike', '💃 dance', '⛵ yacht', '✈️ flight', '🏨 resort', '🦁 safari', '🚢 cruise',
+            '🏔️ lodge', '🏝️ island', '🗽 tour', '🏔️ trek', '🎷 jazz', '🍖 bbq', '🍣 sushi',
+            '🍝 pasta', '🥘 tapas', '💑 date', '🥐 brunch', '☕ cafe', '🎮 game', '🎨 paint'
         ];
 
         // ========== AUDIO - "Will Always Love You" Melody + Bounce Sound ==========
@@ -653,10 +653,10 @@
                     ctx.fillRect(p.x + 2, sy, PLATFORM_W - 4, 3);
 
                     // Draw activity type label under platform
-                    ctx.font = 'bold 11px Arial';
+                    ctx.font = 'bold 13px Arial';
                     ctx.fillStyle = '#333';
                     ctx.textAlign = 'center';
-                    ctx.fillText(p.item, p.x + PLATFORM_W / 2, sy + 22);
+                    ctx.fillText(p.item, p.x + PLATFORM_W / 2, sy + 24);
                     ctx.textAlign = 'left';
 
                     ctx.fillStyle = '#00bb00';
