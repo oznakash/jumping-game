@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.13</div>
+    <div id="version">v1.0.14</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -498,9 +498,12 @@
 
         function getAnniversaryActivity(score) {
             // Determine which group based on score
-            // Score ranges: 0-25 (group 0), 25-50 (group 1), etc.
+            // Score ranges: 0-25 (group 0), 26-35 (group 1), 36-45 (group 2), etc.
             // Maximum groups: 25 (0-24)
-            let groupIndex = Math.floor(score / 50);
+            let groupIndex = 0;
+            if (score >= 26) {
+                groupIndex = Math.floor((score - 26) / 10) + 1;
+            }
             groupIndex = Math.min(groupIndex, 24); // Cap at max group
 
             // Get random activity from the group
