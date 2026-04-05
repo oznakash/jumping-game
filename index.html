@@ -191,6 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
+    <div id="stopwatch" style="display: none; position: fixed; top: 80px; right: 10px; background: rgba(0,0,0,0.7); color: #ff1493; font-size: 1.8em; font-weight: bold; padding: 10px 15px; border-radius: 8px; z-index: 100; font-family: 'Courier New', monospace; min-width: 80px; text-align: center; border: 2px solid #ff1493;">00:00</div>
     <div id="version">v1.0.45</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
@@ -1029,6 +1030,12 @@
         const CHARACTERS = ['🐄', '🐰', '🐵', '👶', '🤖', '🦄'];
         let currentCharacter = '🐰';
 
+        // Stopwatch timer
+        let stopwatchStartTime = 0;
+        let stopwatchElapsed = 0;
+        let stopwatchRunning = false;
+        let stopwatchStopped = false;
+
         const player = {
             x: 0,
             y: 0,
@@ -1457,10 +1464,58 @@
             document.getElementById(id).classList.add('active');
         }
 
+        function formatStopwatch(milliseconds) {
+            const totalSeconds = Math.floor(milliseconds / 1000);
+            const minutes = Math.floor(totalSeconds / 60);
+            const seconds = totalSeconds % 60;
+            return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+        }
+
+        function updateStopwatch() {
+            if (stopwatchRunning && !stopwatchStopped) {
+                stopwatchElapsed = Date.now() - stopwatchStartTime;
+                const stopwatchEl = document.getElementById('stopwatch');
+                if (stopwatchEl) {
+                    stopwatchEl.textContent = formatStopwatch(stopwatchElapsed);
+                }
+            }
+        }
+
+        function startStopwatch() {
+            stopwatchStartTime = Date.now() - stopwatchElapsed;
+            stopwatchRunning = true;
+            stopwatchStopped = false;
+            const stopwatchEl = document.getElementById('stopwatch');
+            if (stopwatchEl) {
+                stopwatchEl.style.display = 'block';
+                stopwatchEl.textContent = '00:00';
+            }
+        }
+
+        function stopStopwatch() {
+            stopwatchRunning = false;
+            stopwatchStopped = true;
+        }
+
+        function resetStopwatch() {
+            stopwatchStartTime = 0;
+            stopwatchElapsed = 0;
+            stopwatchRunning = false;
+            stopwatchStopped = false;
+            const stopwatchEl = document.getElementById('stopwatch');
+            if (stopwatchEl) {
+                stopwatchEl.style.display = 'none';
+                stopwatchEl.textContent = '00:00';
+            }
+        }
+
         function startGame() {
             // Load and apply settings before game starts
             loadSettings();
             applySettingsToGame();
+
+            // Reset stopwatch for new game
+            resetStopwatch();
 
             gameState = 'playing';
             score = 0;
@@ -1504,6 +1559,9 @@
             spawnPlatforms();
 
             document.getElementById('ui').classList.remove('show');
+
+            // Start stopwatch when game begins
+            startStopwatch();
 
             // Stop any existing music and start fresh
             stopGameMusic();
@@ -1657,6 +1715,9 @@
         function gameLoop() {
             try {
                 if (gameState === 'playing') {
+                    // Update stopwatch every frame
+                    updateStopwatch();
+
                     if (leftPressed) player.moveLeft();
                     else if (rightPressed) player.moveRight();
                     else player.stopMove();
@@ -1691,6 +1752,10 @@
                             level = newLevel;
                             if (level <= MAX_LEVEL) {
                                 showLevelUp(level);
+                                // Stop stopwatch when reaching level 14
+                                if (level === MAX_LEVEL) {
+                                    stopStopwatch();
+                                }
                             }
                         }
                     }
