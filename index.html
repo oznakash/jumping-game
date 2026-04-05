@@ -287,6 +287,12 @@
                     <input type="range" id="speedMultSlider" min="0.7" max="1.5" step="0.1" value="1.0" style="width: 100%; cursor: pointer;" onchange="updateSettings()">
                     <div style="font-size: 0.8em; color: #ffb6c1; margin-top: 4px;">Slower ← | → Faster</div>
                 </div>
+
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.95em;">Moving Platform Rate: <span id="movingPlatRateValue" style="color: #ff1493;">10%</span></label>
+                    <input type="range" id="movingPlatRateSlider" min="0" max="100" step="1" value="10" style="width: 100%; cursor: pointer;" onchange="updateSettings()">
+                    <div style="font-size: 0.8em; color: #ffb6c1; margin-top: 4px;">None ← | → All move</div>
+                </div>
             </div>
 
             <!-- Power-Ups & Collectibles Section -->
@@ -562,7 +568,8 @@
             visualTheme: 'dark',
             playableCharacters: ['🐄', '🐰', '🐵', '👶', '🤖', '🦄'],
             romanticTipsStyle: 'affectionate',
-            hintFrequency: 3
+            hintFrequency: 3,
+            movingPlatformRate: 0.10
         };
 
         const PRESETS = {
@@ -578,7 +585,8 @@
                 visualTheme: 'dark',
                 playableCharacters: ['🐄', '🐰', '🐵', '👶', '🤖', '🦄'],
                 romanticTipsStyle: 'affectionate',
-                hintFrequency: 4
+                hintFrequency: 4,
+                movingPlatformRate: 0.15
             }
         };
 
@@ -626,6 +634,9 @@
 
             // Hint frequency: 2 to 8
             validated.hintFrequency = Math.max(2, Math.min(8, parseInt(settings.hintFrequency) || 3));
+
+            // Moving platform rate: 0 to 1 (0% to 100%)
+            validated.movingPlatformRate = Math.max(0, Math.min(1, parseFloat(settings.movingPlatformRate) || 0.10));
 
             return validated;
         }
@@ -685,6 +696,9 @@
             document.getElementById('speedMultSlider').value = currentSettings.gameSpeedMultiplier;
             document.getElementById('speedMultValue').textContent = currentSettings.gameSpeedMultiplier.toFixed(1) + 'x';
 
+            document.getElementById('movingPlatRateSlider').value = (currentSettings.movingPlatformRate * 100).toFixed(0);
+            document.getElementById('movingPlatRateValue').textContent = (currentSettings.movingPlatformRate * 100).toFixed(0) + '%';
+
             document.getElementById('spawnRateSlider').value = (currentSettings.powerUpSpawnRate * 100).toFixed(0);
             document.getElementById('spawnRateValue').textContent = (currentSettings.powerUpSpawnRate * 100).toFixed(0) + '%';
 
@@ -729,6 +743,9 @@
 
             currentSettings.gameSpeedMultiplier = parseFloat(document.getElementById('speedMultSlider').value);
             document.getElementById('speedMultValue').textContent = currentSettings.gameSpeedMultiplier.toFixed(1) + 'x';
+
+            currentSettings.movingPlatformRate = parseInt(document.getElementById('movingPlatRateSlider').value) / 100;
+            document.getElementById('movingPlatRateValue').textContent = (currentSettings.movingPlatformRate * 100).toFixed(0) + '%';
 
             currentSettings.powerUpSpawnRate = parseInt(document.getElementById('spawnRateSlider').value) / 100;
             document.getElementById('spawnRateValue').textContent = (currentSettings.powerUpSpawnRate * 100).toFixed(0) + '%';
@@ -1096,6 +1113,23 @@
                         if (platformsJumped % currentSettings.hintFrequency === 0) {
                             showRomanticTip();
                         }
+
+                        // Handle moving platform - move player with the platform
+                        if (p.isMoving) {
+                            // Apply platform's horizontal movement to player
+                            // This makes the player move with the platform as if standing on it
+                            this.x += p.moveSpeed * p.moveDirection * 0.5; // 50% of platform speed for natural feel
+                        }
+                    }
+                    // Keep player on moving platform while standing on it (continuous movement)
+                    else if (p.isMoving && this.vy >= 0) {
+                        const onPlatformX = this.x + PLAYER_W > p.x && this.x < p.x + PLATFORM_W;
+                        const nearPlatformY = this.y + PLAYER_H >= p.y - 5 && this.y + PLAYER_H <= p.y + PLATFORM_H + 5;
+
+                        // If player is on the platform (not jumping), move with it
+                        if (onPlatformX && nearPlatformY && this.vy > -0.5) {
+                            this.x += p.moveSpeed * p.moveDirection * 0.5; // Move player with platform
+                        }
                     }
                 }
 
@@ -1145,7 +1179,21 @@
                 const gap = gapMin + Math.random() * (gapMax - gapMin);
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
 
-                platforms.push({ x, y: nextPlatformY, item });
+                // Determine if this platform should move
+                const isMoving = Math.random() < currentSettings.movingPlatformRate;
+                const platformObj = { x, y: nextPlatformY, item };
+
+                if (isMoving) {
+                    // Add moving platform properties
+                    platformObj.isMoving = true;
+                    platformObj.originalX = x;
+                    platformObj.moveDistance = 60 + Math.random() * 40; // 60-100 pixels
+                    platformObj.moveSpeed = 1.5 + Math.random() * 1; // 1.5-2.5 pixels per frame
+                    platformObj.moveDirection = Math.random() < 0.5 ? 1 : -1; // Start direction
+                    platformObj.moveOffset = 0; // Current offset from original position
+                }
+
+                platforms.push(platformObj);
                 nextPlatformY -= gap;  // Subtract to move upward (decreasing Y)
             }
 
@@ -1156,7 +1204,21 @@
                 const gap = gapMin + Math.random() * (gapMax - gapMin);
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
 
-                platforms.push({ x, y: nextPlatformYDown, item });
+                // Determine if this platform should move
+                const isMoving = Math.random() < currentSettings.movingPlatformRate;
+                const platformObj = { x, y: nextPlatformYDown, item };
+
+                if (isMoving) {
+                    // Add moving platform properties
+                    platformObj.isMoving = true;
+                    platformObj.originalX = x;
+                    platformObj.moveDistance = 60 + Math.random() * 40; // 60-100 pixels
+                    platformObj.moveSpeed = 1.5 + Math.random() * 1; // 1.5-2.5 pixels per frame
+                    platformObj.moveDirection = Math.random() < 0.5 ? 1 : -1; // Start direction
+                    platformObj.moveOffset = 0; // Current offset from original position
+                }
+
+                platforms.push(platformObj);
                 nextPlatformYDown += gap;  // Add to move downward (increasing Y)
             }
 
@@ -1168,6 +1230,40 @@
 
             // Cleanup off-screen power-ups
             cleanupPowerUps();
+        }
+
+        function updateMovingPlatforms() {
+            const w = W();
+            platforms.forEach(p => {
+                if (p.isMoving) {
+                    // Update the movement offset
+                    p.moveOffset += p.moveSpeed * p.moveDirection;
+
+                    // Reverse direction if platform hits movement boundary
+                    if (p.moveOffset >= p.moveDistance || p.moveOffset <= -p.moveDistance) {
+                        p.moveDirection *= -1; // Reverse direction
+                        // Clamp to boundaries
+                        p.moveOffset = Math.max(-p.moveDistance, Math.min(p.moveDistance, p.moveOffset));
+                    }
+
+                    // Calculate current x position
+                    const currentX = p.originalX + p.moveOffset;
+
+                    // Keep platform on screen - if it would go off left side, move right
+                    if (currentX < 0) {
+                        p.moveDirection = 1;
+                        p.moveOffset = -p.originalX;
+                    }
+                    // If it would go off right side, move left
+                    else if (currentX + PLATFORM_W > w) {
+                        p.moveDirection = -1;
+                        p.moveOffset = w - PLATFORM_W - p.originalX;
+                    }
+
+                    // Update the actual x position
+                    p.x = p.originalX + p.moveOffset;
+                }
+            });
         }
 
         function spawnPowerUpsOnPlatforms() {
@@ -1324,9 +1420,26 @@
             for (let p of platforms) {
                 const sy = p.y - cameraY;
                 if (sy > -50 && sy < h + 50) {
+                    // Draw platform base
+                    if (p.isMoving) {
+                        ctx.fillStyle = '#0088dd'; // Blue for moving platforms
+                    } else {
+                        ctx.fillStyle = '#00bb00'; // Green for static platforms
+                    }
                     ctx.fillRect(p.x, sy, PLATFORM_W, PLATFORM_H);
+
+                    // Draw highlight stripe
                     ctx.fillStyle = '#ffdd00';
                     ctx.fillRect(p.x + 2, sy, PLATFORM_W - 4, 3);
+
+                    // Draw movement indicator for moving platforms
+                    if (p.isMoving) {
+                        // Draw directional arrow to show movement
+                        ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                        ctx.font = 'bold 10px Arial';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(p.moveDirection > 0 ? '→' : '←', p.x + PLATFORM_W / 2, sy + PLATFORM_H / 2 + 2);
+                    }
 
                     // Draw activity type label under platform
                     ctx.font = 'bold 13px Arial';
@@ -1725,6 +1838,7 @@
                     player.update();
                     updateCamera();
                     spawnPlatforms();
+                    updateMovingPlatforms();
 
                     // Check game over: player falls too far below last platform jumped from
                     // Allow falling 1/3 screen height below last jump before game over
