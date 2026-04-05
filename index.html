@@ -191,7 +191,7 @@
 <body>
     <canvas id="gameCanvas"></canvas>
     <div id="romanticTip"></div>
-    <div id="version">v1.0.27</div>
+    <div id="version">v1.0.28</div>
     <div id="levelUp">
         <h1 id="levelUpText">Year 1 🎉</h1>
         <div class="gift">🎁</div>
@@ -651,27 +651,9 @@
             draw() {
                 const sy = this.y - cameraY;
 
-                // Color based on character
-                let color = '#ff1493';  // default pink
-                if (currentCharacter === '🐄') color = '#8B6F47';      // Cow - brown
-                else if (currentCharacter === '🐰') color = '#FFB6C1';  // Bunny - light pink
-                else if (currentCharacter === '🐵') color = '#8B4513';  // Monkey - saddle brown
-                else if (currentCharacter === '👶') color = '#FDBCB4';  // Baby - peach
-                else if (currentCharacter === '🤖') color = '#A9A9A9';  // Robot - gray
-
-                ctx.fillStyle = color;
-                ctx.fillRect(this.x, sy, PLAYER_W, PLAYER_H);
-
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(this.x + 6, sy + 6, 4, 4);
-                ctx.fillRect(this.x + 14, sy + 6, 4, 4);
-                ctx.fillStyle = '#000';
-                ctx.fillRect(this.x + 7, sy + 7, 2, 2);
-                ctx.fillRect(this.x + 15, sy + 7, 2, 2);
-
-                // Draw emoji on rectangle
+                // Draw emoji
                 ctx.save();
-                ctx.font = '24px Arial';
+                ctx.font = '36px Arial';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 ctx.fillText(currentCharacter, this.x + PLAYER_W / 2, sy + PLAYER_H / 2);
@@ -685,19 +667,21 @@
 
             if (!w || !h || w === 0 || h === 0) return;
 
-            // Spawn platforms infinitely far ahead to allow infinite climbing
-            const spawnDistance = Math.max(nextPlatformY + 5000, cameraY + h * 10);
-            while (nextPlatformY < spawnDistance) {
+            // Always spawn platforms well ahead of camera (15 screen heights ahead)
+            // Use Math.min because Y values are negative (moving up)
+            const spawnTarget = cameraY - h * 15;
+
+            while (nextPlatformY > spawnTarget) {
                 const x = Math.random() * Math.max(0, w - PLATFORM_W);
                 const gap = PLATFORM_GAP_MIN + Math.random() * (PLATFORM_GAP_MAX - PLATFORM_GAP_MIN);
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
 
                 platforms.push({ x, y: nextPlatformY, item });
-                nextPlatformY += gap;
+                nextPlatformY -= gap;  // Subtract gap because we're moving up (negative direction)
             }
 
-            // Keep platforms that are visible or upcoming
-            platforms = platforms.filter(p => p.y < cameraY + h * 6);
+            // Keep platforms that are visible or upcoming (10 screen heights above and below camera)
+            platforms = platforms.filter(p => p.y > cameraY - h * 10 && p.y < cameraY + h * 2);
         }
 
         function updateCamera() {
