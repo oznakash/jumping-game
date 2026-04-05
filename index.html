@@ -1053,6 +1053,24 @@
         let stopwatchRunning = false;
         let stopwatchStopped = false;
 
+        // Progressive difficulty scaling
+        // Difficulty increases by 10% every 150 points (not gravity)
+        function getProgressiveDifficultyMultiplier() {
+            const difficultyLevel = Math.floor(score / 150);
+            return 1.0 + (difficultyLevel * 0.10); // 1.0 at 0-149, 1.1 at 150-299, 1.2 at 300-449, etc.
+        }
+
+        // Get difficulty-adjusted setting value
+        function getDifficultySetting(baseSetting, shouldIncrease = true) {
+            const multiplier = getProgressiveDifficultyMultiplier();
+            if (shouldIncrease) {
+                return baseSetting * multiplier;
+            } else {
+                // For settings that should decrease with difficulty (like jump power)
+                return baseSetting / multiplier;
+            }
+        }
+
         const player = {
             x: 0,
             y: 0,
@@ -1062,14 +1080,17 @@
             init() {
                 this.x = W() / 2 - PLAYER_W / 2;
                 this.y = H() * 0.4;
-                const jumpPower = currentSettings.jumpPower * currentSettings.gameSpeedMultiplier;
+                const speedMultiplier = currentSettings.gameSpeedMultiplier * getProgressiveDifficultyMultiplier();
+                const jumpPower = (currentSettings.jumpPower / getProgressiveDifficultyMultiplier()) * speedMultiplier;
                 this.vy = -jumpPower;
                 this.vx = 0;
             },
 
             update() {
-                const gravity = currentSettings.gravity * currentSettings.gameSpeedMultiplier;
-                const jumpPower = currentSettings.jumpPower * currentSettings.gameSpeedMultiplier;
+                // Apply progressive difficulty scaling (except gravity itself)
+                const speedMultiplier = currentSettings.gameSpeedMultiplier * getProgressiveDifficultyMultiplier();
+                const gravity = currentSettings.gravity * currentSettings.gameSpeedMultiplier; // Gravity NOT scaled by progressive difficulty
+                const jumpPower = (currentSettings.jumpPower / getProgressiveDifficultyMultiplier()) * speedMultiplier; // Jump power decreases with difficulty
 
                 this.vy += gravity;
                 this.y += this.vy;
@@ -1172,15 +1193,22 @@
 
             // Spawn platforms upward (negative direction) - spawn MUCH further ahead at high scores
             const spawnTargetUp = cameraY - h * 25;
-            const gapMin = currentSettings.platformGapMin;
-            const gapMax = currentSettings.platformGapMax;
+
+            // Apply progressive difficulty to platform gaps
+            const gapMin = currentSettings.platformGapMin * getProgressiveDifficultyMultiplier();
+            const gapMax = currentSettings.platformGapMax * getProgressiveDifficultyMultiplier();
+
+            // Clamp gaps to reasonable values to prevent impossible jumps
+            const clampedGapMin = Math.min(gapMin, 120);
+            const clampedGapMax = Math.min(gapMax, 200);
             while (nextPlatformY > spawnTargetUp) {
                 const x = Math.random() * Math.max(0, w - PLATFORM_W);
-                const gap = gapMin + Math.random() * (gapMax - gapMin);
+                const gap = clampedGapMin + Math.random() * (clampedGapMax - clampedGapMin);
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
 
-                // Determine if this platform should move
-                const isMoving = Math.random() < currentSettings.movingPlatformRate;
+                // Apply progressive difficulty to moving platform rate
+                const difficultyMovingRate = Math.min(0.5, currentSettings.movingPlatformRate * getProgressiveDifficultyMultiplier());
+                const isMoving = Math.random() < difficultyMovingRate;
                 const platformObj = { x, y: nextPlatformY, item };
 
                 if (isMoving) {
@@ -1201,11 +1229,12 @@
             const spawnTargetDown = cameraY + h * 3;
             while (nextPlatformYDown < spawnTargetDown && nextPlatformYDown < H()) {
                 const x = Math.random() * Math.max(0, w - PLATFORM_W);
-                const gap = gapMin + Math.random() * (gapMax - gapMin);
+                const gap = clampedGapMin + Math.random() * (clampedGapMax - clampedGapMin);
                 const item = PLATFORM_ITEMS[Math.floor(Math.random() * PLATFORM_ITEMS.length)];
 
-                // Determine if this platform should move
-                const isMoving = Math.random() < currentSettings.movingPlatformRate;
+                // Apply progressive difficulty to moving platform rate
+                const difficultyMovingRate = Math.min(0.5, currentSettings.movingPlatformRate * getProgressiveDifficultyMultiplier());
+                const isMoving = Math.random() < difficultyMovingRate;
                 const platformObj = { x, y: nextPlatformYDown, item };
 
                 if (isMoving) {
@@ -1269,8 +1298,11 @@
         function spawnPowerUpsOnPlatforms() {
             try {
                 // Only spawn power-ups on newly created platforms (those not yet processed)
+                // Progressive difficulty: power-ups become rarer as score increases
+                const difficultyPowerUpRate = currentSettings.powerUpSpawnRate / getProgressiveDifficultyMultiplier();
+
                 platforms.forEach(p => {
-                    if (!p.hasPowerUp && Math.random() < currentSettings.powerUpSpawnRate) {
+                    if (!p.hasPowerUp && Math.random() < difficultyPowerUpRate) {
                         p.hasPowerUp = true;
 
                         // Select random power-up type based on probability
