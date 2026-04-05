@@ -245,146 +245,154 @@
         </div>
 
         <div id="settingsScreen" class="screen">
-            <h2>⚙️ Game Settings ⚙️</h2>
+            <h2>⚙️ Game Settings</h2>
+            <div style="font-size: 0.9em; color: #ff69b4; margin-bottom: 20px;">Customize your game experience</div>
+
+            <div style="max-height: 70vh; overflow-y: auto; padding-right: 10px;">
 
             <!-- Gameplay Section -->
-            <div style="margin-top: 25px; padding: 15px; background: rgba(255,105,180,0.1); border-radius: 8px; border-left: 4px solid #ff69b4;">
-                <h3 style="font-size: 1.3em; margin-bottom: 15px;">🎮 Gameplay</h3>
+            <div style="margin-top: 15px; padding: 20px; background: linear-gradient(135deg, rgba(255,105,180,0.15) 0%, rgba(255,105,180,0.05) 100%); border-radius: 12px; border-left: 5px solid #ff69b4;">
+                <h3 style="font-size: 1.25em; margin: 0 0 20px 0; color: #ff1493;">🎮 Gameplay</h3>
 
-                <div style="margin: 15px 0;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Gravity Strength: <span id="gravityValue">0.3</span></label>
-                    <input type="range" id="gravitySlider" min="0.1" max="0.6" step="0.05" value="0.3" style="width: 100%;" onchange="updateSettings()">
-                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 3px;">Lower = easier, Higher = harder</div>
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.95em;">Gravity Strength: <span id="gravityValue" style="color: #ff1493;">0.3</span></label>
+                    <input type="range" id="gravitySlider" min="0.1" max="0.6" step="0.05" value="0.3" style="width: 100%; cursor: pointer;" onchange="updateSettings()">
+                    <div style="font-size: 0.8em; color: #ffb6c1; margin-top: 4px;">Easier ← | → Harder</div>
                 </div>
 
-                <div style="margin: 15px 0;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Jump Power: <span id="jumpPowerValue">11</span></label>
-                    <input type="range" id="jumpPowerSlider" min="8" max="14" step="0.5" value="11" style="width: 100%;" onchange="updateSettings()">
-                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 3px;">Lower = easier, Higher = harder</div>
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.95em;">Jump Power: <span id="jumpPowerValue" style="color: #ff1493;">11</span></label>
+                    <input type="range" id="jumpPowerSlider" min="8" max="14" step="0.5" value="11" style="width: 100%; cursor: pointer;" onchange="updateSettings()">
+                    <div style="font-size: 0.8em; color: #ffb6c1; margin-top: 4px;">Lower = easier, Higher = harder</div>
                 </div>
 
-                <div style="margin: 15px 0;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Platform Gap Size: <span id="platformGapValue">50-80</span></label>
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.95em;">Platform Gap Size: <span id="platformGapValue" style="color: #ff1493;">50-80</span></label>
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                         <div>
-                            <label style="font-size: 0.9em;">Min: <span id="gapMinValue">50</span></label>
-                            <input type="range" id="gapMinSlider" min="30" max="70" step="5" value="50" style="width: 100%;" onchange="updateSettings()">
+                            <label style="font-size: 0.9em; margin-bottom: 4px; display: block;">Min: <span id="gapMinValue" style="color: #ff1493;">50</span></label>
+                            <input type="range" id="gapMinSlider" min="30" max="70" step="5" value="50" style="width: 100%; cursor: pointer;" onchange="updateSettings()">
                         </div>
                         <div>
-                            <label style="font-size: 0.9em;">Max: <span id="gapMaxValue">80</span></label>
-                            <input type="range" id="gapMaxSlider" min="70" max="120" step="5" value="80" style="width: 100%;" onchange="updateSettings()">
+                            <label style="font-size: 0.9em; margin-bottom: 4px; display: block;">Max: <span id="gapMaxValue" style="color: #ff1493;">80</span></label>
+                            <input type="range" id="gapMaxSlider" min="70" max="120" step="5" value="80" style="width: 100%; cursor: pointer;" onchange="updateSettings()">
                         </div>
                     </div>
-                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 5px;">Larger gaps = harder jumps</div>
+                    <div style="font-size: 0.8em; color: #ffb6c1; margin-top: 4px;">Larger gaps = harder jumps</div>
                 </div>
 
-                <div style="margin: 15px 0;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Game Speed Multiplier: <span id="speedMultValue">1.0x</span></label>
-                    <input type="range" id="speedMultSlider" min="0.7" max="1.5" step="0.1" value="1.0" style="width: 100%;" onchange="updateSettings()">
-                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 3px;">Affects fall and jump speeds</div>
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.95em;">Game Speed Multiplier: <span id="speedMultValue" style="color: #ff1493;">1.0x</span></label>
+                    <input type="range" id="speedMultSlider" min="0.7" max="1.5" step="0.1" value="1.0" style="width: 100%; cursor: pointer;" onchange="updateSettings()">
+                    <div style="font-size: 0.8em; color: #ffb6c1; margin-top: 4px;">Slower ← | → Faster</div>
                 </div>
             </div>
 
             <!-- Power-Ups & Collectibles Section -->
-            <div style="margin-top: 25px; padding: 15px; background: rgba(255,192,203,0.1); border-radius: 8px; border-left: 4px solid #ffb6c1;">
-                <h3 style="font-size: 1.3em; margin-bottom: 15px;">💎 Power-Ups & Collectibles</h3>
+            <div style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, rgba(255,192,203,0.15) 0%, rgba(255,192,203,0.05) 100%); border-radius: 12px; border-left: 5px solid #ffb6c1;">
+                <h3 style="font-size: 1.25em; margin: 0 0 20px 0; color: #ff69b4;">💎 Power-Ups</h3>
 
-                <div style="margin: 15px 0;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Power-Up Spawn Rate: <span id="spawnRateValue">19%</span></label>
-                    <input type="range" id="spawnRateSlider" min="8" max="35" step="1" value="19" style="width: 100%;" onchange="updateSettings()">
-                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 3px;">Higher = more power-ups appear</div>
+                <div style="margin-bottom: 0;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.95em;">Power-Up Spawn Rate: <span id="spawnRateValue" style="color: #ff69b4;">19%</span></label>
+                    <input type="range" id="spawnRateSlider" min="8" max="35" step="1" value="19" style="width: 100%; cursor: pointer;" onchange="updateSettings()">
+                    <div style="font-size: 0.8em; color: #ffb6c1; margin-top: 4px;">Less frequent ← | → More frequent</div>
                 </div>
             </div>
 
             <!-- Audio & Visual Section -->
-            <div style="margin-top: 25px; padding: 15px; background: rgba(147,112,219,0.1); border-radius: 8px; border-left: 4px solid #9370db;">
-                <h3 style="font-size: 1.3em; margin-bottom: 15px;">🎵 Audio & Visual</h3>
+            <div style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, rgba(100,150,255,0.15) 0%, rgba(100,150,255,0.05) 100%); border-radius: 12px; border-left: 5px solid #6496ff;">
+                <h3 style="font-size: 1.25em; margin: 0 0 20px 0; color: #4169e1;">🎵 Audio & Visual</h3>
 
-                <div style="margin: 15px 0;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Sound Effects Volume: <span id="soundVolValue">100%</span></label>
-                    <input type="range" id="soundVolSlider" min="0" max="100" step="10" value="100" style="width: 100%;" onchange="updateSettings()">
-                    <div style="font-size: 0.85em; color: #9370db; margin-top: 3px;">0% = muted, 100% = full volume</div>
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.95em;">Sound Effects Volume: <span id="soundVolValue" style="color: #4169e1;">100%</span></label>
+                    <input type="range" id="soundVolSlider" min="0" max="100" step="10" value="100" style="width: 100%; cursor: pointer;" onchange="updateSettings()">
+                    <div style="font-size: 0.8em; color: #6496ff; margin-top: 4px;">Muted ← | → Full Volume</div>
                 </div>
 
-                <div style="margin: 15px 0;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Visual Theme:</label>
-                    <div style="display: flex; gap: 15px; margin-top: 8px;">
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="radio" name="theme" value="dark" checked onchange="updateSettings()"> Dark
+                <div style="margin-bottom: 0;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: bold; font-size: 0.95em;">Visual Theme:</label>
+                    <div style="display: flex; gap: 18px;">
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.95em;">
+                            <input type="radio" name="theme" value="dark" checked onchange="updateSettings()"> 🌙 Dark
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="radio" name="theme" value="light" onchange="updateSettings()"> Light
+                        <label style="display: flex; align-items: center; gap: 6px; cursor: pointer; font-size: 0.95em;">
+                            <input type="radio" name="theme" value="light" onchange="updateSettings()"> ☀️ Light
                         </label>
                     </div>
                 </div>
             </div>
 
             <!-- Experience & Content Section -->
-            <div style="margin-top: 25px; padding: 15px; background: rgba(255,215,0,0.1); border-radius: 8px; border-left: 4px solid #ffd700;">
-                <h3 style="font-size: 1.3em; margin-bottom: 15px;">💕 Experience & Content</h3>
+            <div style="margin-top: 20px; padding: 20px; background: linear-gradient(135deg, rgba(255,215,0,0.15) 0%, rgba(255,215,0,0.05) 100%); border-radius: 12px; border-left: 5px solid #ffd700;">
+                <h3 style="font-size: 1.25em; margin: 0 0 20px 0; color: #ff8c00;">💕 Experience & Content</h3>
 
-                <div style="margin: 15px 0;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Playable Characters:</label>
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 10px; font-weight: bold; font-size: 0.95em;">Playable Characters:</label>
                     <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px;">
-                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
-                            <input type="checkbox" value="🐄" class="charCheckbox" checked onchange="updateSettings()"> 🐄 Cow
+                        <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 6px; background: rgba(255,105,180,0.2); border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;">
+                            <input type="checkbox" value="🐄" class="charCheckbox" checked onchange="updateSettings()" style="cursor: pointer;"> 🐄
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
-                            <input type="checkbox" value="🐰" class="charCheckbox" checked onchange="updateSettings()"> 🐰 Bunny
+                        <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 6px; background: rgba(255,105,180,0.2); border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;">
+                            <input type="checkbox" value="🐰" class="charCheckbox" checked onchange="updateSettings()" style="cursor: pointer;"> 🐰
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
-                            <input type="checkbox" value="🐵" class="charCheckbox" checked onchange="updateSettings()"> 🐵 Monkey
+                        <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 6px; background: rgba(255,105,180,0.2); border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;">
+                            <input type="checkbox" value="🐵" class="charCheckbox" checked onchange="updateSettings()" style="cursor: pointer;"> 🐵
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
-                            <input type="checkbox" value="👶" class="charCheckbox" checked onchange="updateSettings()"> 👶 Baby
+                        <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 6px; background: rgba(255,105,180,0.2); border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;">
+                            <input type="checkbox" value="👶" class="charCheckbox" checked onchange="updateSettings()" style="cursor: pointer;"> 👶
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
-                            <input type="checkbox" value="🤖" class="charCheckbox" checked onchange="updateSettings()"> 🤖 Robot
+                        <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 6px; background: rgba(255,105,180,0.2); border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;">
+                            <input type="checkbox" value="🤖" class="charCheckbox" checked onchange="updateSettings()" style="cursor: pointer;"> 🤖
                         </label>
-                        <label style="display: flex; align-items: center; gap: 8px; padding: 8px; background: rgba(255,105,180,0.15); border-radius: 4px; cursor: pointer;">
-                            <input type="checkbox" value="🦄" class="charCheckbox" checked onchange="updateSettings()"> 🦄 Unicorn
-                        </label>
-                    </div>
-                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 8px;">Select which characters appear in the game</div>
-                </div>
-
-                <div style="margin: 15px 0;">
-                    <label style="display: block; margin-bottom: 8px; font-weight: bold;">Romantic Tips Style:</label>
-                    <div style="display: flex; flex-direction: column; gap: 8px;">
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="radio" name="tipsStyle" value="affectionate" checked onchange="updateSettings()"> 💕 Affectionate (romantic & loving)
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="radio" name="tipsStyle" value="playful" onchange="updateSettings()"> 😄 Playful (fun & silly)
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="radio" name="tipsStyle" value="thoughtful" onchange="updateSettings()"> 🤔 Thoughtful (deep & meaningful)
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="radio" name="tipsStyle" value="adventurous" onchange="updateSettings()"> 🎯 Adventurous (exciting activities)
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
-                            <input type="radio" name="tipsStyle" value="mixed" onchange="updateSettings()"> 🎪 Mixed (all types)
+                        <label style="display: flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 6px; background: rgba(255,105,180,0.2); border-radius: 6px; cursor: pointer; border: 2px solid transparent; transition: all 0.2s;">
+                            <input type="checkbox" value="🦄" class="charCheckbox" checked onchange="updateSettings()" style="cursor: pointer;"> 🦄
                         </label>
                     </div>
+                    <div style="font-size: 0.8em; color: #ffb6c1; margin-top: 8px;">Select which characters appear in the game</div>
                 </div>
 
-                <div style="margin: 15px 0;">
-                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Hint Frequency: <span id="hintFreqValue">Every 3 platforms</span></label>
-                    <input type="range" id="hintFreqSlider" min="2" max="8" step="1" value="3" style="width: 100%;" onchange="updateSettings()">
-                    <div style="font-size: 0.85em; color: #ff69b4; margin-top: 3px;">More frequent = more tips shown</div>
+                <div style="margin-bottom: 18px;">
+                    <label style="display: block; margin-bottom: 9px; font-weight: bold; font-size: 0.95em;">Romantic Tips Style:</label>
+                    <div style="display: flex; flex-direction: column; gap: 7px;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9em;">
+                            <input type="radio" name="tipsStyle" value="affectionate" checked onchange="updateSettings()" style="cursor: pointer;"> 💕 Affectionate
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9em;">
+                            <input type="radio" name="tipsStyle" value="playful" onchange="updateSettings()" style="cursor: pointer;"> 😄 Playful
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9em;">
+                            <input type="radio" name="tipsStyle" value="thoughtful" onchange="updateSettings()" style="cursor: pointer;"> 🤔 Thoughtful
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9em;">
+                            <input type="radio" name="tipsStyle" value="adventurous" onchange="updateSettings()" style="cursor: pointer;"> 🎯 Adventurous
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; font-size: 0.9em;">
+                            <input type="radio" name="tipsStyle" value="mixed" onchange="updateSettings()" style="cursor: pointer;"> 🎪 Mixed
+                        </label>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 0;">
+                    <label style="display: block; margin-bottom: 6px; font-weight: bold; font-size: 0.95em;">Hint Frequency: <span id="hintFreqValue" style="color: #ff8c00;">Every 3 platforms</span></label>
+                    <input type="range" id="hintFreqSlider" min="2" max="8" step="1" value="3" style="width: 100%; cursor: pointer;" onchange="updateSettings()">
+                    <div style="font-size: 0.8em; color: #ffb6c1; margin-top: 4px;">Less frequent ← | → More frequent</div>
                 </div>
             </div>
 
+            </div>
+
             <!-- Presets & Actions -->
-            <div style="margin-top: 25px; text-align: center;">
-                <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px;">
-                    <button onclick="applyPreset('RESET')" style="background: #4CAF50; flex: 1; min-width: 120px;">↺ Reset to Default</button>
-                    <button onclick="applyPreset('DIFFICULT')" style="background: #ff4444; flex: 1; min-width: 120px;">⚡ Difficult Mode</button>
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid rgba(255,105,180,0.2); text-align: center;">
+                <div style="margin-bottom: 20px;">
+                    <p style="font-size: 0.95em; color: #ffb6c1; margin-bottom: 12px; font-weight: bold;">Quick Presets</p>
+                    <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+                        <button onclick="applyPreset('RESET')" style="background: #4CAF50; padding: 10px 20px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; flex: 1; min-width: 140px;">↺ Reset to Default</button>
+                        <button onclick="applyPreset('DIFFICULT')" style="background: #ff6b6b; padding: 10px 20px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; flex: 1; min-width: 140px;">⚡ Difficult Mode</button>
+                    </div>
                 </div>
-                <div style="display: flex; gap: 10px; justify-content: center;">
-                    <button onclick="saveAndCloseSettings()" style="background: #ff1493; flex: 1; min-width: 100px;">✓ Save</button>
-                    <button onclick="closeSettings()" style="background: #666; flex: 1; min-width: 100px;">✕ Cancel</button>
+                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 15px;">
+                    <button onclick="saveAndCloseSettings()" style="background: #ff1493; padding: 12px 30px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 1em;">✓ Save & Close</button>
+                    <button onclick="closeSettings()" style="background: #555; padding: 12px 30px; border-radius: 6px; border: none; color: white; font-weight: bold; cursor: pointer; font-size: 1em;">✕ Cancel</button>
                 </div>
             </div>
         </div>
@@ -557,17 +565,17 @@
         const PRESETS = {
             RESET: DEFAULT_SETTINGS,
             DIFFICULT: {
-                gravity: 0.5,
-                jumpPower: 9,
-                platformGapMin: 65,
-                platformGapMax: 100,
-                gameSpeedMultiplier: 1.2,
-                powerUpSpawnRate: 0.10,
+                gravity: 0.4,
+                jumpPower: 10,
+                platformGapMin: 60,
+                platformGapMax: 95,
+                gameSpeedMultiplier: 1.1,
+                powerUpSpawnRate: 0.12,
                 soundVolume: 100,
                 visualTheme: 'dark',
                 playableCharacters: ['🐄', '🐰', '🐵', '👶', '🤖', '🦄'],
                 romanticTipsStyle: 'affectionate',
-                hintFrequency: 5
+                hintFrequency: 4
             }
         };
 
